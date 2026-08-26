@@ -1,16 +1,23 @@
-import { ArrowLeft, ImageIcon, Send } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowLeft, ImageIcon, Maximize2 } from 'lucide-react'
 import ProductGlyph from './ProductGlyph'
 import Reveal from './Reveal'
-import { contact } from '../../data/site'
+import DetailDialog from './DetailDialog'
 
 /**
  * One product tile, shared by the desktop grid and the mobile rails.
+ *
+ * The whole card is a button: tapping it opens the product's dialog rather
+ * than jumping straight to a chat, so a visitor can read the full description,
+ * see the images and check the specifications before deciding to get in touch.
  *
  * `anchored` decides which copy owns the `id` used by the navbar and footer
  * links — the mobile rails render the same product several times (once per
  * category row), and only one of those may claim the anchor.
  */
 export default function ProductCard({ product, delay = 0, anchored = true, reveal = true }) {
+  const [open, setOpen] = useState(false)
+
   // Inside the mobile rails the whole row reveals at once. Animating each card
   // as well would shift them vertically inside the horizontal scroller, which
   // reads as the cards jumping and clipping at the top.
@@ -21,7 +28,7 @@ export default function ProductCard({ product, delay = 0, anchored = true, revea
     <Frame {...frameProps}>
       <article
         id={anchored ? product.id : undefined}
-        className="group surface-glass lift-card relative flex h-full scroll-mt-28 flex-col overflow-hidden rounded-3xl hover:border-brand-400/60 hover:shadow-2xl hover:shadow-brand-600/10"
+        className="group surface-glass lift-card relative flex h-full scroll-mt-28 flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-2xl hover:shadow-brand-600/10"
       >
         {/* Illustration panel — the slot real photography will take over. */}
         <div className="relative aspect-16/10 overflow-hidden bg-linear-to-bl from-brand-500/12 via-accent-500/8 to-transparent">
@@ -77,18 +84,34 @@ export default function ProductCard({ product, delay = 0, anchored = true, revea
             ))}
           </ul>
 
-          <a
-            href={contact.telegram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ease-soft mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-brand-500/8 px-4 py-3 text-sm font-bold text-brand-ink transition-[background-color,color,border-color] duration-500 hover:bg-brand-500 hover:text-white active:scale-97 dark:hover:text-white"
+          {/* Stretched to cover the card, so the whole tile is the hit area
+              while the accessible name stays on this one control. */}
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="ease-soft mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-brand-500/8 px-4 py-3 text-sm font-bold text-brand-ink transition-[background-color,color,border-color] duration-500 before:absolute before:inset-0 before:content-[''] hover:bg-brand-500 hover:text-white active:scale-97 dark:hover:text-white"
           >
-            <Send className="size-4" />
-            استعلام قیمت این محصول
+            <Maximize2 className="size-4" />
+            مشاهده جزئیات
             <ArrowLeft className="ease-soft size-3.5 transition-transform duration-500 group-hover:-translate-x-1" />
-          </a>
+          </button>
         </div>
       </article>
+
+      <DetailDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title={product.title}
+        subtitle={product.short}
+        icon={<ProductGlyph name={product.icon} className="size-7" />}
+        glyph={product.icon}
+        gallery={product.gallery}
+        lead={product.description}
+        body={product.detail}
+        meta={product.specs}
+        points={product.uses}
+        pointsTitle="کاربردهای رایج"
+      />
     </Frame>
   )
 }

@@ -1,3 +1,4 @@
+import ContactDialogProvider from './components/ContactDialog'
 import PageLoader from './components/PageLoader'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
@@ -16,7 +17,7 @@ import FloatingContact from './components/FloatingContact'
 
 export default function App() {
   return (
-    <>
+    <ContactDialogProvider>
       <PageLoader />
       <Navbar />
 
@@ -36,6 +37,6 @@ export default function App() {
 
       <Footer />
       <FloatingContact />
-    </>
+    </ContactDialogProvider>
   )
 }

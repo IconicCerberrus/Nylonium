@@ -1,12 +1,33 @@
+import { useState } from 'react'
+import { ClipboardCheck, Factory, MessageSquare, Truck } from 'lucide-react'
 import Reveal from './ui/Reveal'
 import SectionHeading from './ui/SectionHeading'
+import DetailDialog from './ui/DetailDialog'
+import { useRetained } from './ui/useRetained'
 import { process } from '../data/site'
+
+const ICONS = {
+  message: MessageSquare,
+  clipboard: ClipboardCheck,
+  factory: Factory,
+  truck: Truck,
+}
 
 /**
  * Four-step order flow. On large screens the steps sit on a horizontal rail;
  * below that they stack into a vertical timeline so nothing gets cramped.
+ *
+ * Only the numbered badge is interactive — the surrounding text stays plain,
+ * so the hover state points at exactly the thing that can be clicked instead
+ * of lighting up the whole column. Hovering lifts the badge a little and
+ * lowers it again on the way out; nothing swaps or repaints, which is what
+ * made the earlier version flicker.
  */
 export default function Process() {
+  const [active, setActive] = useState(null)
+  const step = useRetained(process.find((s) => s.id === active))
+  const ActiveIcon = step ? (ICONS[step.icon] ?? MessageSquare) : null
+
   return (
     <section
       id="process"
@@ -18,7 +39,7 @@ export default function Process() {
         <SectionHeading
           eyebrow="فرآیند سفارش"
           title="از پیام تا تحویل، در چهار قدم"
-          text="سفارش گرفتن پیچیده نیست. کافی است بگویید چه می‌خواهید؛ بقیه مسیر را ما هماهنگ می‌کنیم."
+          text="سفارش گرفتن پیچیده نیست. کافی است بگویید چه می‌خواهید؛ بقیه مسیر را ما هماهنگ می‌کنیم. روی شماره هر مرحله بزنید تا جزئیاتش را ببینید."
         />
 
         <ol className="relative mt-16 grid gap-8 lg:grid-cols-4 lg:gap-6">
@@ -28,23 +49,42 @@ export default function Process() {
             aria-hidden="true"
           />
 
-          {process.map((step, i) => (
-            <Reveal
-              as="li"
-              key={step.step}
-              delay={i * 110}
-              className="group relative ps-16 lg:ps-0"
-            >
-              <span className="ease-soft absolute top-0 right-0 grid size-12 place-items-center rounded-2xl border border-brand-500/30 bg-[var(--surface)] text-sm font-black text-brand-ink shadow-lg shadow-brand-600/10 transition-transform duration-700 group-hover:scale-110 lg:relative lg:mb-5">
-                {step.step}
-              </span>
+          {process.map((s, i) => {
+            const Icon = ICONS[s.icon] ?? MessageSquare
+            return (
+              <Reveal as="li" key={s.id} delay={i * 110} className="relative ps-16 lg:ps-0">
+                <button
+                  type="button"
+                  onClick={() => setActive(s.id)}
+                  aria-label={`جزئیات قدم ${s.step} — ${s.title}`}
+                  className="ease-soft absolute top-0 right-0 grid size-12 place-items-center rounded-2xl border border-brand-500/30 bg-[var(--surface)] text-sm font-black text-brand-ink shadow-lg shadow-brand-600/10 transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1.5 hover:border-brand-400 hover:shadow-xl hover:shadow-brand-600/25 active:translate-y-0 lg:relative lg:mb-5"
+                >
+                  {s.step}
+                </button>
 
-              <h3 className="text-base font-extrabold sm:text-lg">{step.title}</h3>
-              <p className="mt-2 max-w-sm text-sm leading-7 text-[var(--text-body)]">{step.text}</p>
-            </Reveal>
-          ))}
+                <h3 className="flex items-center gap-2 text-base font-extrabold sm:text-lg">
+                  <Icon className="size-4.5 shrink-0 text-brand-ink" />
+                  {s.title}
+                </h3>
+
+                <p className="mt-2 max-w-sm text-sm leading-7 text-[var(--text-body)]">{s.text}</p>
+              </Reveal>
+            )
+          })}
         </ol>
       </div>
+
+      <DetailDialog
+        open={Boolean(active)}
+        onClose={() => setActive(null)}
+        title={step ? `قدم ${step.step} — ${step.title}` : ''}
+        subtitle={step?.duration ? `زمان تقریبی: ${step.duration}` : undefined}
+        icon={ActiveIcon ? <ActiveIcon className="size-5.5" /> : null}
+        lead={step?.text}
+        body={step?.detail}
+        points={step?.points}
+        pointsTitle="در این مرحله چه اتفاقی می‌افتد"
+      />
     </section>
   )
 }

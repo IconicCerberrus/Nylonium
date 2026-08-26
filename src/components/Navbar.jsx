@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChevronDown, Menu, MoonStar, Phone, Send, Sun, X } from 'lucide-react'
+import { ChevronDown, Menu, MoonStar, Send, Sun, X } from 'lucide-react'
 import Logo from './ui/Logo'
 import { useTheme } from './ui/useTheme'
-import { contact, navLinks, site } from '../data/site'
+import { useContactDialog } from './ui/contactDialogContext'
+import { navLinks, site } from '../data/site'
 
 /**
  * Reading-progress bar pinned under the header.
@@ -143,6 +144,7 @@ function DesktopLink({ link }) {
 }
 
 export default function Navbar() {
+  const { openContact } = useContactDialog()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [openGroup, setOpenGroup] = useState(null)
@@ -177,27 +179,6 @@ export default function Navbar() {
         رفتن به محصولات
       </a>
 
-      {/* Utility strip — hidden once the visitor starts scrolling. */}
-      <div
-        className={`hidden overflow-hidden border-b border-[var(--line)] bg-[var(--surface-muted)] transition-[height,opacity] duration-300 lg:block ${
-          scrolled ? 'h-0 opacity-0' : 'h-10 opacity-100'
-        }`}
-      >
-        <div className="mx-auto flex h-10 max-w-7xl items-center justify-between px-6 text-xs text-[var(--text-soft)]">
-          <p>{site.tagline}</p>
-          <div className="flex items-center gap-5">
-            <span>{contact.hours}</span>
-            <a
-              href={contact.phoneHref}
-              className="ease-soft flex items-center gap-1.5 font-medium text-[var(--text-body)] transition-colors duration-400 hover:text-brand-ink"
-            >
-              <Phone className="size-3.5" />
-              <span dir="ltr">{contact.phoneDisplay}</span>
-            </a>
-          </div>
-        </div>
-      </div>
-
       <header
         className={`sticky top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300 ${
           scrolled
@@ -228,15 +209,14 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <ThemeToggle />
 
-            <a
-              href={contact.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => openContact()}
               className="ease-soft hidden items-center gap-2 rounded-xl bg-linear-to-l from-brand-600 to-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition-[box-shadow,transform] duration-500 hover:shadow-xl hover:shadow-brand-600/35 active:scale-95 sm:flex"
             >
               <Send className="size-4" />
               استعلام قیمت
-            </a>
+            </button>
 
             <button
               type="button"
@@ -356,24 +336,18 @@ export default function Navbar() {
           </nav>
 
           <div className="space-y-2.5 border-t border-[var(--line)] p-4">
-            <a
-              href={contact.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
               tabIndex={menuOpen ? 0 : -1}
-              className="flex items-center justify-center gap-2 rounded-xl bg-linear-to-l from-brand-600 to-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 active:scale-98"
+              onClick={() => {
+                setMenuOpen(false)
+                openContact()
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-l from-brand-600 to-brand-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 active:scale-98"
             >
               <Send className="size-4" />
-              استعلام قیمت در تلگرام
-            </a>
-            <a
-              href={contact.phoneHref}
-              tabIndex={menuOpen ? 0 : -1}
-              className="flex items-center justify-center gap-2 rounded-xl border border-[var(--line)] px-4 py-3 text-sm font-semibold text-[var(--text-strong)] active:scale-98"
-            >
-              <Phone className="size-4" />
-              <span dir="ltr">{contact.phoneDisplay}</span>
-            </a>
+              استعلام قیمت
+            </button>
           </div>
         </div>
       </div>

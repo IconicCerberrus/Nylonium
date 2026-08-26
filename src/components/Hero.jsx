@@ -1,5 +1,6 @@
-import { ArrowLeft, MessageCircle, Phone, Send, Sparkles } from 'lucide-react'
-import { contact, products } from '../data/site'
+import { ArrowLeft, Send, Sparkles } from 'lucide-react'
+import { useContactDialog } from './ui/contactDialogContext'
+import { products } from '../data/site'
 
 /**
  * Animated film stack: three translucent sheets drifting over each other,
@@ -89,6 +90,7 @@ function SpecChip({ children, className = '', delay = '0s' }) {
 }
 
 export default function Hero() {
+  const { openContact } = useContactDialog()
   const highlights = products.filter((p) => p.featured).slice(0, 3)
 
   return (
@@ -122,10 +124,9 @@ export default function Hero() {
           </p>
 
           <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
-            <a
-              href={contact.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => openContact()}
               className="ease-soft group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl bg-linear-to-l from-brand-600 to-brand-500 px-7 py-4 text-sm font-bold text-white shadow-xl shadow-brand-600/30 transition-[box-shadow,transform] duration-700 hover:shadow-2xl hover:shadow-brand-600/40 active:scale-97 sm:text-base"
             >
               <span
@@ -133,9 +134,9 @@ export default function Hero() {
                 aria-hidden="true"
               />
               <Send className="size-4.5" />
-              استعلام قیمت در تلگرام
+              استعلام قیمت
               <ArrowLeft className="ease-soft size-4 transition-transform duration-500 group-hover:-translate-x-1" />
-            </a>
+            </button>
 
             <a
               href="#products"
@@ -144,34 +145,6 @@ export default function Hero() {
               مشاهده محصولات
             </a>
           </div>
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-[var(--text-soft)] lg:justify-start">
-            <a
-              href={contact.phoneHref}
-              className="flex items-center gap-2 transition-colors hover:text-brand-ink"
-            >
-              <Phone className="size-4" />
-              <span dir="ltr" className="font-semibold">
-                {contact.phoneDisplay}
-              </span>
-            </a>
-            <a
-              href={contact.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 transition-colors hover:text-brand-ink"
-            >
-              <MessageCircle className="size-4" />
-              واتساپ
-            </a>
-            <span className="hidden items-center gap-2 sm:flex">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-500 opacity-70" />
-                <span className="relative inline-flex size-2 rounded-full bg-brand-500" />
-              </span>
-              آماده پاسخگویی
-            </span>
-          </div>
         </div>
 
         {/* Artwork column */}
@@ -179,19 +152,21 @@ export default function Hero() {
           <div className="relative aspect-square">
             <FilmArtwork />
 
-            <SpecChip className="top-[6%] right-[2%] sm:right-[-4%]" delay="-2s">
+            {/* All three chips ride the left edge, stacked in one column, so
+                they read as a single spec panel instead of drifting apart. */}
+            <SpecChip className="top-[14%] left-[0%] sm:left-[-5%]" delay="-2s">
               <p className="text-[0.7rem] text-[var(--text-soft)]">عرض تولید</p>
               <p className="text-sm font-bold text-[var(--text-strong)]">تا ۱۴ متر</p>
             </SpecChip>
 
-            <SpecChip className="bottom-[26%] left-[0%] sm:left-[-5%]" delay="-5s">
-              <p className="text-[0.7rem] text-[var(--text-soft)]">بازه ضخامت</p>
-              <p className="text-sm font-bold text-[var(--text-strong)]">۱۲ تا ۴۰۰ میکرون</p>
-            </SpecChip>
-
-            <SpecChip className="top-[44%] left-[4%] hidden sm:block" delay="-7.5s">
+            <SpecChip className="top-[42%] left-[0%] sm:left-[-5%]" delay="-5s">
               <p className="text-[0.7rem] text-[var(--text-soft)]">پوشش گلخانه</p>
               <p className="text-sm font-bold text-brand-ink">ضد UV</p>
+            </SpecChip>
+
+            <SpecChip className="top-[70%] left-[0%] sm:left-[-5%]" delay="-7.5s">
+              <p className="text-[0.7rem] text-[var(--text-soft)]">بازه ضخامت</p>
+              <p className="text-sm font-bold text-[var(--text-strong)]">۱۲ تا ۴۰۰ میکرون</p>
             </SpecChip>
           </div>
 
