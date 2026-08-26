@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { ChevronDown, ExternalLink, Mail, MessageCircle, Phone, Send } from 'lucide-react'
+import { ArrowLeft, ChevronDown, Mail, MessageCircle, Phone, Send } from 'lucide-react'
 import Modal from './ui/Modal'
 import { ContactDialogContext } from './ui/contactDialogContext'
 import { contactChannels, quoteChannels } from '../data/site'
@@ -79,22 +79,25 @@ function ChannelRow({ channel, expanded, onToggle }) {
                     tabIndex={expanded ? 0 : -1}
                     className="ease-soft group flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 transition-[border-color,background-color] duration-400 hover:border-brand-400/70 hover:bg-brand-500/8 active:scale-98"
                   >
-                    <span className="min-w-0 flex-1">
+                    {/* Both lines are right-aligned even though the value runs
+                        left-to-right, so the number sits directly under its
+                        own label instead of drifting to the far edge. */}
+                    <span className="min-w-0 flex-1 text-right">
                       <span className="block text-[0.68rem] text-[var(--text-soft)]">
                         {entry.label}
                       </span>
                       <span
                         className="mt-0.5 block truncate text-sm font-bold text-[var(--text-strong)]"
                         dir={entry.ltr ? 'ltr' : undefined}
-                        style={entry.ltr ? { textAlign: 'start' } : undefined}
+                        style={entry.ltr ? { textAlign: 'right' } : undefined}
                       >
                         {entry.value}
                       </span>
                     </span>
-                    <ExternalLink
-                      className="ease-soft size-4 shrink-0 text-[var(--text-soft)] transition-[color,transform] duration-400 group-hover:-translate-x-0.5 group-hover:text-brand-ink"
-                      aria-hidden="true"
-                    />
+
+                    <span className="ease-soft grid size-8 shrink-0 place-items-center rounded-full bg-brand-500/10 text-brand-ink transition-[background-color,transform] duration-400 group-hover:-translate-x-0.5 group-hover:bg-brand-500 group-hover:text-white">
+                      <ArrowLeft className="size-4" aria-hidden="true" />
+                    </span>
                   </a>
                 </li>
               ))}
@@ -133,6 +136,7 @@ export default function ContactDialogProvider({ children }) {
       <Modal
         open={state.open}
         onClose={close}
+        layer={100}
         title="استعلام قیمت و تماس"
         subtitle="راه ارتباطی را انتخاب کنید"
         icon={<Send className="size-5.5" />}

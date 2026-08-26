@@ -370,6 +370,60 @@
   }
 }
 
+/* Dialog motion.
+   The entry state is supplied by @starting-style rather than by a JavaScript
+   class flip, so the browser animates the element the moment it is inserted.
+   Timing a flip by hand needs a frame to land between "mounted closed" and
+   "now open", and requestAnimationFrame does not fire in a backgrounded tab —
+   which is exactly why the first open used to appear with no animation at all.
+
+   Entry and exit deliberately use different curves: an expo-out floats the
+   panel up and settles it almost to a stop, while an ease-in lets it creep
+   away before accelerating instead of snapping shut. */
+.dialog-panel,
+.dialog-veil {
+  --dialog-enter: 620ms;
+  --dialog-exit: 520ms;
+  --dialog-enter-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dialog-exit-ease: cubic-bezier(0.55, 0, 0.85, 0.25);
+}
+
+.dialog-panel {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity var(--dialog-enter) var(--dialog-enter-ease),
+    transform var(--dialog-enter) var(--dialog-enter-ease);
+  will-change: opacity, transform;
+}
+
+.dialog-veil {
+  opacity: 1;
+  transition: opacity var(--dialog-enter) var(--dialog-enter-ease);
+}
+
+@starting-style {
+  .dialog-panel {
+    opacity: 0;
+    transform: translateY(3rem) scale(0.94);
+  }
+
+  .dialog-veil {
+    opacity: 0;
+  }
+}
+
+.dialog-panel[data-closing],
+.dialog-veil[data-closing] {
+  transition-duration: var(--dialog-exit);
+  transition-timing-function: var(--dialog-exit-ease);
+  opacity: 0;
+}
+
+.dialog-panel[data-closing] {
+  transform: translateY(3rem) scale(0.94);
+}
+
 /* ── Motion preferences ──────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
@@ -385,5 +439,10 @@
   .lift-card:hover,
   .lift-chip:hover {
     transform: none;
+  }
+
+  .dialog-panel,
+  .dialog-veil {
+    transition: none;
   }
 }

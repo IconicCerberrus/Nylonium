@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, ImageIcon, Maximize2 } from 'lucide-react'
+import { ArrowLeft, ImageIcon } from 'lucide-react'
 import ProductGlyph from './ProductGlyph'
 import Reveal from './Reveal'
 import DetailDialog from './DetailDialog'
@@ -28,7 +28,8 @@ export default function ProductCard({ product, delay = 0, anchored = true, revea
     <Frame {...frameProps}>
       <article
         id={anchored ? product.id : undefined}
-        className="group surface-glass lift-card relative flex h-full scroll-mt-28 flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-2xl hover:shadow-brand-600/10"
+        onClick={() => setOpen(true)}
+        className="group surface-glass lift-card relative flex h-full cursor-pointer scroll-mt-28 flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-2xl hover:shadow-brand-600/10"
       >
         {/* Illustration panel — the slot real photography will take over. */}
         <div className="relative aspect-16/10 overflow-hidden bg-linear-to-bl from-brand-500/12 via-accent-500/8 to-transparent">
@@ -84,14 +85,12 @@ export default function ProductCard({ product, delay = 0, anchored = true, revea
             ))}
           </ul>
 
-          {/* Stretched to cover the card, so the whole tile is the hit area
-              while the accessible name stays on this one control. */}
+          {/* The card itself carries the click; this button exists so the
+              action is reachable by keyboard and has an accessible name. */}
           <button
             type="button"
-            onClick={() => setOpen(true)}
-            className="ease-soft mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-brand-500/8 px-4 py-3 text-sm font-bold text-brand-ink transition-[background-color,color,border-color] duration-500 before:absolute before:inset-0 before:content-[''] hover:bg-brand-500 hover:text-white active:scale-97 dark:hover:text-white"
+            className="ease-soft mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-brand-500/30 bg-brand-500/8 px-4 py-3 text-sm font-bold text-brand-ink transition-[background-color,color,border-color] duration-500 group-hover:bg-brand-500 group-hover:text-white active:scale-97"
           >
-            <Maximize2 className="size-4" />
             مشاهده جزئیات
             <ArrowLeft className="ease-soft size-3.5 transition-transform duration-500 group-hover:-translate-x-1" />
           </button>

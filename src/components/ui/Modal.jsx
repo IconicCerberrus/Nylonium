@@ -5,16 +5,8 @@ import { X } from 'lucide-react'
 const FOCUSABLE =
   'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
-/**
- * Entry and exit are deliberately different curves. Coming in uses an
- * expo-out: it arrives quickly then settles almost to a stop, which reads as
- * "floating up". Going out uses an ease-in so it creeps away before
- * accelerating, instead of snapping the moment the close button is pressed.
- */
-const ENTER_MS = 480
-const EXIT_MS = 400
-const ENTER_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
-const EXIT_EASE = 'cubic-bezier(0.5, 0, 0.75, 0.2)'
+/** Must stay in step with --dialog-exit in index.css. */
+const EXIT_MS = 520
 
 /**
  * Centred dialog used by every pop-up on the page.
@@ -32,30 +24,29 @@ const EXIT_EASE = 'cubic-bezier(0.5, 0, 0.75, 0.2)'
  * inside animated wrappers — without the portal the dialog would be trapped
  * inside a card instead of centred on the screen.
  */
-export default function Modal({ open, onClose, title, subtitle, icon, children, footer }) {
+export default function Modal({
+  open,
+  onClose,
+  title,
+  subtitle,
+  icon,
+  children,
+  footer,
+  layer = 90,
+}) {
   const panelRef = useRef(null)
   const openerRef = useRef(null)
   const [mounted, setMounted] = useState(open)
-  const [shown, setShown] = useState(false)
 
-  // Mount immediately on open; wait out the full exit transition before
-  // unmounting, with headroom so a late frame can never clip the fade.
+  // Mount on open; hold the node through its exit transition before removing
+  // it, with headroom so a late frame can never clip the fade. The entry
+  // animation itself needs no JavaScript — @starting-style handles it.
   useEffect(() => {
     if (open) {
       setMounted(true)
-      // Two frames: the first commits the closed state, the second flips to
-      // open — without it the browser coalesces both and skips the animation.
-      let second = 0
-      const first = requestAnimationFrame(() => {
-        second = requestAnimationFrame(() => setShown(true))
-      })
-      return () => {
-        cancelAnimationFrame(first)
-        cancelAnimationFrame(second)
-      }
+      return
     }
-    setShown(false)
-    const t = setTimeout(() => setMounted(false), EXIT_MS + 60)
+    const t = setTimeout(() => setMounted(false), EXIT_MS + 80)
     return () => clearTimeout(t)
   }, [open])
 
@@ -108,18 +99,14 @@ export default function Modal({ open, onClose, title, subtitle, icon, children, 
 
   return createPortal(
     <div
-      className="fixed inset-0 z-90 flex items-end justify-center p-0 sm:items-center sm:p-6"
+      className="fixed inset-0 flex items-end justify-center p-0 sm:items-center sm:p-6"
+      style={{ zIndex: layer }}
       role="presentation"
       onKeyDown={onKeyDown}
     >
       <div
-        className={`absolute inset-0 bg-ink-950/60 backdrop-blur-sm transition-opacity motion-reduce:transition-none ${
-          shown ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{
-          transitionDuration: `${shown ? ENTER_MS : EXIT_MS}ms`,
-          transitionTimingFunction: shown ? ENTER_EASE : EXIT_EASE,
-        }}
+        className="dialog-veil absolute inset-0 bg-ink-950/60 backdrop-blur-sm"
+        data-closing={open ? undefined : ''}
         onClick={onClose}
         aria-hidden="true"
       />
@@ -130,13 +117,8 @@ export default function Modal({ open, onClose, title, subtitle, icon, children, 
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-4xl border border-[var(--line)] bg-[var(--surface)] shadow-2xl shadow-ink-950/25 outline-none transition-[opacity,transform] will-change-[opacity,transform] motion-reduce:transition-none sm:max-w-3xl sm:rounded-4xl dark:shadow-black/60"
-        style={{
-          transitionDuration: `${shown ? ENTER_MS : EXIT_MS}ms`,
-          transitionTimingFunction: shown ? ENTER_EASE : EXIT_EASE,
-          opacity: shown ? 1 : 0,
-          transform: shown ? 'translateY(0) scale(1)' : 'translateY(2.25rem) scale(0.96)',
-        }}
+        className="dialog-panel relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-4xl border border-[var(--line)] bg-[var(--surface)] shadow-2xl shadow-ink-950/25 outline-none sm:max-w-3xl sm:rounded-4xl dark:shadow-black/60"
+        data-closing={open ? undefined : ''}
       >
         {/* Grab handle, phones only */}
         <span

@@ -1,6 +1,7 @@
-import { Send } from 'lucide-react'
+import { MessageCircle, Phone, Send } from 'lucide-react'
 import Reveal from './ui/Reveal'
 import { useContactDialog } from './ui/contactDialogContext'
+import { contact } from '../data/site'
 
 /** Full-bleed conversion band sitting between the FAQ and the contact block. */
 export default function CtaBand() {
@@ -54,14 +55,37 @@ export default function CtaBand() {
           می‌دهد و قیمت روز را همان‌جا اعلام می‌کند — بدون هیچ هزینه‌ای.
         </p>
 
-        <button
-          type="button"
-          onClick={() => openContact()}
-          className="lift-chip group mt-9 inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-8 py-4 text-sm font-bold text-brand-700 shadow-xl shadow-black/10 active:scale-97 sm:text-base"
-        >
-          <Send className="ease-soft size-4.5 transition-transform duration-500 group-hover:-translate-x-1" />
-          استعلام قیمت
-        </button>
+        {/* The original three-button row, restored — but each one opens the
+            contact dialog on its own channel instead of firing straight out,
+            so the visitor can still see the number before committing. */}
+        <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={() => openContact('telegram')}
+            className="lift-chip group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-7 py-4 text-sm font-bold text-brand-700 shadow-xl shadow-black/10 active:scale-97 sm:text-base"
+          >
+            <Send className="ease-soft size-4.5 transition-transform duration-500 group-hover:-translate-x-1" />
+            گفت‌وگو در تلگرام
+          </button>
+
+          <button
+            type="button"
+            onClick={() => openContact('whatsapp')}
+            className="ease-soft inline-flex items-center justify-center gap-2 rounded-2xl border border-white/35 px-7 py-4 text-sm font-bold text-white backdrop-blur-sm transition-[background-color] duration-500 hover:bg-white/12 active:scale-97 sm:text-base"
+          >
+            <MessageCircle className="size-4.5" />
+            واتساپ
+          </button>
+
+          <button
+            type="button"
+            onClick={() => openContact('phone')}
+            className="ease-soft inline-flex items-center justify-center gap-2 rounded-2xl border border-white/35 px-7 py-4 text-sm font-bold text-white backdrop-blur-sm transition-[background-color] duration-500 hover:bg-white/12 active:scale-97 sm:text-base"
+          >
+            <Phone className="size-4.5" />
+            <span dir="ltr">{contact.phoneDisplay}</span>
+          </button>
+        </div>
       </Reveal>
     </section>
   )

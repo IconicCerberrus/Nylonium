@@ -100,10 +100,10 @@ export default function DetailDialog({
         cta ? (
           <button
             type="button"
-            onClick={() => {
-              onClose()
-              openContact()
-            }}
+            // Deliberately leaves this dialog open: the contact panel stacks
+            // on top, so closing it returns the reader to what they were
+            // reading instead of dumping them back on the page.
+            onClick={() => openContact()}
             className="ease-soft group flex w-full items-center justify-center gap-2 rounded-2xl bg-linear-to-l from-brand-600 to-brand-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-600/25 transition-[box-shadow,transform] duration-500 hover:shadow-xl hover:shadow-brand-600/35 active:scale-98"
           >
             <Send className="ease-soft size-4 transition-transform duration-500 group-hover:-translate-x-1" />
