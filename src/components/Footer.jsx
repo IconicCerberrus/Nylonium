@@ -1,14 +1,15 @@
 import { ArrowUp, Mail, MessageCircle, Phone, Send } from 'lucide-react'
 import Logo from './ui/Logo'
+import { home } from '../lib/links'
 import { contact, navLinks, products, site } from '../data/site'
 
 const quickLinks = [
-  { label: 'محصولات', href: '#products' },
-  { label: 'چرا نایلونیوم', href: '#why' },
-  { label: 'کاربردها', href: '#industries' },
-  { label: 'فرآیند سفارش', href: '#process' },
-  { label: 'سوالات پرتکرار', href: '#faq' },
-  { label: 'تماس با ما', href: '#contact' },
+  { label: 'محصولات', hash: '#products' },
+  { label: 'چرا نایلونیوم', hash: '#why' },
+  { label: 'کاربردها', hash: '#industries' },
+  { label: 'فرآیند سفارش', hash: '#process' },
+  { label: 'سوالات پرتکرار', hash: '#faq' },
+  { label: 'تماس با ما', hash: '#contact' },
 ]
 
 export default function Footer() {
@@ -25,7 +26,7 @@ export default function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           {/* Brand */}
           <div>
-            <a href="#top" className="group flex items-center gap-3">
+            <a href={home()} className="group flex items-center gap-3">
               <Logo
                 id="footer"
                 className="ease-soft size-11 transition-transform duration-700 group-hover:rotate-6"
@@ -81,7 +82,7 @@ export default function Footer() {
               {products.slice(0, 6).map((p) => (
                 <li key={p.id}>
                   <a
-                    href={`#${p.id}`}
+                    href={home(`#${p.id}`)}
                     className="sweep-underline ease-soft inline-block text-sm text-[var(--text-body)] transition-colors duration-400 hover:text-brand-ink"
                   >
                     {p.title}
@@ -96,9 +97,9 @@ export default function Footer() {
             <h3 className="text-sm font-extrabold text-[var(--text-strong)]">دسترسی سریع</h3>
             <ul className="mt-5 space-y-2.5">
               {quickLinks.map((l) => (
-                <li key={l.href}>
+                <li key={l.hash}>
                   <a
-                    href={l.href}
+                    href={home(l.hash)}
                     className="sweep-underline ease-soft inline-block text-sm text-[var(--text-body)] transition-colors duration-400 hover:text-brand-ink"
                   >
                     {l.label}
@@ -161,7 +162,7 @@ export default function Footer() {
             .flatMap((l) => [l, ...(l.children ?? [])])
             .map((l) => (
               <li key={`${l.label}-${l.href}`}>
-                <a href={l.href}>{l.label}</a>
+                <a href={l.home ? home(l.href) : l.href}>{l.label}</a>
               </li>
             ))}
         </ul>

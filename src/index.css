@@ -314,6 +314,45 @@
   }
 }
 
+/* Category rail: a horizontal, snapping track whose visible card count is
+   set per breakpoint through --rail-visible. The basis subtracts the gaps
+   first, so N cards plus their gaps land exactly on the track width and the
+   next card never peeks out or clips at the edge.
+
+   --rail-visible is deliberately NOT given a value here. This rule is
+   unlayered, and unlayered declarations outrank everything inside a cascade
+   layer — a default set here would beat the responsive `sm:[--rail-visible:3]`
+   utility and pin every breakpoint to one card. The fallback lives in the
+   calc() instead, where a utility can override it. */
+.rail {
+  --rail-gap: 1rem;
+
+  display: flex;
+  align-items: stretch;
+  gap: var(--rail-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.rail > * {
+  flex: 0 0 calc((100% - (var(--rail-visible) - 1) * var(--rail-gap)) / var(--rail-visible));
+  scroll-snap-align: start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail {
+    scroll-behavior: auto;
+  }
+}
+
 /* Mobile product rails: native swipe + snap, no scrollbar chrome.
    `align-items: stretch` plus a fixed flex basis keeps every card the same
    height and the same distance from the top of the row, so paging moves the

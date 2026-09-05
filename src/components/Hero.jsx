@@ -103,7 +103,7 @@ export default function Hero() {
         aria-hidden="true"
       />
 
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:pt-20 lg:pb-28">
+      <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 pt-2 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:pt-2 lg:pb-24">
         {/* Copy column */}
         <div className="relative z-10 text-center lg:text-right">
           <p className="surface-glass inline-flex items-center gap-2 rounded-full py-1.5 ps-4 pe-2.5 text-xs font-medium text-[var(--text-body)] sm:text-sm">

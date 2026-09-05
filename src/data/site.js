@@ -95,20 +95,25 @@ export const contactChannels = [
 /** The three channels offered when the visitor asks for a price. */
 export const quoteChannels = contactChannels.filter((c) => c.id !== 'email')
 
+/**
+ * Labels and order are fixed by the client — only the destinations changed
+ * when each entry gained a page of its own. `home: true` marks the one link
+ * that still points at a section of the landing page.
+ */
 export const navLinks = [
   {
     label: 'نایلون طاقه‌ای',
-    href: '#products',
+    href: 'tagheei.html',
     children: [
-      { label: 'نایلون عریض طاقه‌ای', href: '#p-wide' },
-      { label: 'نایلون کم‌عرض طاقه‌ای', href: '#p-narrow' },
+      { label: 'نایلون عریض طاقه‌ای', href: 'tagheei.html#c-wide' },
+      { label: 'نایلون کم‌عرض طاقه‌ای', href: 'tagheei.html#c-narrow' },
     ],
   },
-  { label: 'نایلون یووی گلخانه‌ای', href: '#p-uv' },
-  { label: 'نایلون شیرینک', href: '#p-shrink' },
-  { label: 'کیسه نایلون', href: '#p-bag' },
-  { label: 'استرچ', href: '#p-stretch' },
-  { label: 'تماس با ما', href: '#contact' },
+  { label: 'نایلون یووی گلخانه‌ای', href: 'greenhouse.html' },
+  { label: 'نایلون شیرینک', href: 'shrink.html' },
+  { label: 'کیسه نایلون', href: 'bags.html' },
+  { label: 'استرچ', href: 'stretch.html' },
+  { label: 'تماس با ما', href: '#contact', home: true },
 ]
 
 /**

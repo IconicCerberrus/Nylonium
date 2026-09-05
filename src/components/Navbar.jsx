@@ -3,6 +3,7 @@ import { ChevronDown, Menu, MoonStar, Send, Sun, X } from 'lucide-react'
 import Logo from './ui/Logo'
 import { useTheme } from './ui/useTheme'
 import { useContactDialog } from './ui/contactDialogContext'
+import { home } from '../lib/links'
 import { navLinks, site } from '../data/site'
 
 /**
@@ -88,7 +89,7 @@ function DesktopLink({ link }) {
   if (!link.children) {
     return (
       <a
-        href={link.href}
+        href={link.home ? home(link.href) : link.href}
         className="ease-soft relative rounded-lg px-3 py-2 text-sm font-medium text-[var(--text-body)] transition-colors duration-400 hover:text-brand-ink after:absolute after:inset-x-3 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-brand-500 after:transition-transform after:duration-[420ms] after:ease-[cubic-bezier(0.33,1,0.45,1)] hover:after:origin-right hover:after:scale-x-100"
       >
         {link.label}
@@ -107,7 +108,7 @@ function DesktopLink({ link }) {
   return (
     <div className="relative" onMouseEnter={show} onMouseLeave={hide}>
       <a
-        href={link.href}
+        href={link.home ? home(link.href) : link.href}
         onFocus={show}
         aria-expanded={open}
         className="ease-soft flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[var(--text-body)] transition-colors duration-400 hover:text-brand-ink"
@@ -173,7 +174,7 @@ export default function Navbar() {
   return (
     <>
       <a
-        href="#products"
+        href={home('#products')}
         className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:right-3 focus:z-100 focus:rounded-xl focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm focus:text-white"
       >
         رفتن به محصولات
@@ -186,8 +187,8 @@ export default function Navbar() {
             : 'border-b border-transparent bg-transparent'
         }`}
       >
-        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-18">
-          <a href="#top" className="group flex shrink-0 items-center gap-2.5">
+        <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-16">
+          <a href={home()} className="group flex shrink-0 items-center gap-2.5">
             <Logo
               id="nav"
               className="ease-soft size-9 transition-transform duration-700 group-hover:rotate-6 lg:size-10"
@@ -322,7 +323,7 @@ export default function Navbar() {
                     </>
                   ) : (
                     <a
-                      href={link.href}
+                      href={link.home ? home(link.href) : link.href}
                       tabIndex={menuOpen ? 0 : -1}
                       onClick={() => setMenuOpen(false)}
                       className="block rounded-xl px-3 py-3 text-[0.95rem] font-medium text-[var(--text-strong)] transition-colors hover:bg-brand-500/8 hover:text-brand-ink"
