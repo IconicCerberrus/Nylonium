@@ -154,7 +154,7 @@ writeFileSync(
     home: true,
     view: null,
     path: '',
-    entry: '/src/main.jsx',
+    entry: '/src/entries/main.jsx',
     title: `${site.name} | تولید انواع نایلون صنعتی، کشاورزی و بسته‌بندی`,
     description:
       'نایلونیوم — تولیدکننده انواع نایلون طاقه‌ای، نایلون یووی گلخانه‌ای، مالچ کشاورزی، شیرینک، حبابی، استرچ و کیسه نایلون در ابعاد مختلف.',
@@ -172,7 +172,7 @@ writeFileSync(
   shell({
     view: null,
     path: 'contact.html',
-    entry: '/src/pages/contact.jsx',
+    entry: '/src/entries/contact.jsx',
     title: `تماس با ما | ${site.name}`,
     description: `راه‌های ارتباط با ${site.name} — تلگرام، واتساپ، تماس تلفنی و ایمیل. استعلام قیمت روز و مشاوره فنی رایگان.`,
     graph: [
@@ -199,7 +199,7 @@ for (const page of productPages) {
       pageId: page.id,
       view: 'family',
       path: page.slug,
-      entry: '/src/pages/product.jsx',
+      entry: '/src/entries/product.jsx',
       title: page.metaTitle,
       description: page.metaDescription,
       graph: [
@@ -236,7 +236,7 @@ for (const page of productPages) {
       pageId: page.id,
       view: 'all',
       path: page.allSlug,
-      entry: '/src/pages/product.jsx',
+      entry: '/src/entries/product.jsx',
       title: `همه محصولات ${page.title} | ${site.name}`,
       description: `فهرست کامل تنوع‌های ${page.title} تولید نایلونیوم در عرض، ضخامت و رنگ‌های مختلف.`,
       graph: [
@@ -264,7 +264,7 @@ for (const page of productPages) {
         variantId: variant.id,
         depth: 1,
         path,
-        entry: '/src/pages/product.jsx',
+        entry: '/src/entries/product.jsx',
         title: `${variant.title} | ${page.title} — ${site.name}`,
         description: `${variant.title} — ${variant.short}. ${specs}. تولید نایلونیوم با امکان سفارش در ابعاد دلخواه.`,
         graph: [
