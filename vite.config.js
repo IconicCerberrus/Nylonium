@@ -25,10 +25,56 @@ const htmlIn = (dir, prefix = '') => {
 
 const pages = Object.fromEntries([...htmlIn('.'), ...htmlIn('product', 'product/')])
 
+/**
+ * Preloads the Arabic subset of the body font.
+ *
+ * Without it the font is not requested until the stylesheet has been fetched
+ * and parsed, which puts a whole round trip in front of the text every page
+ * renders with. The filename is content-hashed, so it has to be read from the
+ * bundle rather than written into the shells by hand.
+ */
+function preloadBodyFont() {
+  let href = null
+
+  return {
+    name: 'preload-body-font',
+    enforce: 'post',
+    apply: 'build',
+
+    transformIndexHtml(html, ctx) {
+      if (!href && ctx.bundle) {
+        // `base` is absolute, so one href is correct from the project root
+        // and from product/ alike — no relative walking needed.
+        href = Object.keys(ctx.bundle).find(
+          (f) => f.includes('vazirmatn-arabic') && f.endsWith('.woff2'),
+        )
+      }
+      if (!href) return html
+
+      return {
+        html,
+        tags: [
+          {
+            tag: 'link',
+            injectTo: 'head-prepend',
+            attrs: {
+              rel: 'preload',
+              as: 'font',
+              type: 'font/woff2',
+              href: base + href,
+              crossorigin: '',
+            },
+          },
+        ],
+      }
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   base,
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), preloadBodyFont()],
   build: {
     rollupOptions: { input: pages },
   },

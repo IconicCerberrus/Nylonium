@@ -27,8 +27,10 @@ export default function PageLoader() {
     }
 
     const fonts = document.fonts?.ready ?? Promise.resolve()
-    // Never let a stalled font request keep the curtain up.
-    const cap = new Promise((resolve) => setTimeout(resolve, 2200))
+    // Never let a stalled font request keep the curtain up. The font is
+    // bundled locally and preloaded, so it resolves well inside this — the
+    // cap only exists for the pathological case.
+    const cap = new Promise((resolve) => setTimeout(resolve, 800))
 
     // A short timer rather than rAF: requestAnimationFrame never fires while
     // the tab is backgrounded, which would strand the curtain on screen.
