@@ -6,7 +6,12 @@
  * from a product page the same target has to name the file first, otherwise
  * the browser looks for a section that is not there.
  */
-const onHome = () => !document.documentElement.dataset.page
+/**
+ * Only index.html carries `data-home`. Testing for it beats inferring from a
+ * missing product id — the contact page has no product either, and inferring
+ * left its in-page anchors pointing at sections it does not contain.
+ */
+const onHome = () => document.documentElement.dataset.home !== undefined
 
 /**
  * Prefix that walks back up to the project root.
