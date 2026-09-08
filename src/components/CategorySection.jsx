@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import VariantCard from './ui/VariantCard'
 import Reveal from './ui/Reveal'
 import { useMediaQuery } from './ui/useMediaQuery'
+import { variantSlug } from '../data/pages'
 
 /**
  * One category of a product family: heading, note, then its variants.
@@ -12,10 +13,12 @@ import { useMediaQuery } from './ui/useMediaQuery'
  * busywork. Below that they become a snapping rail — one card at a time on a
  * phone, three across on a tablet — advanced by swipe or by the two arrows.
  *
- * The arrows live in the heading row rather than floating over the track, so
- * they can never sit on top of a card or clip one at the edge.
+ * The arrows sit in their own columns either side of the track — not floating
+ * over it and not parked up in the heading. Giving them real width means the
+ * rail is laid out in what is left over, so an arrow can never cover a card or
+ * clip one at the edge.
  */
-export default function CategorySection({ category, index = 0 }) {
+export default function CategorySection({ category, pageId, index = 0 }) {
   const railRef = useRef(null)
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const [atStart, setAtStart] = useState(true)
@@ -78,58 +81,71 @@ export default function CategorySection({ category, index = 0 }) {
   }, [isDesktop])
 
   const arrow =
-    'ease-soft grid size-9 place-items-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--text-body)] transition-[color,border-color,opacity,transform] duration-400 hover:border-brand-400/70 hover:text-brand-ink active:scale-90 disabled:pointer-events-none disabled:opacity-30'
+    'ease-soft grid size-8 shrink-0 place-items-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--text-body)] shadow-sm transition-[color,border-color,opacity,transform] duration-400 hover:border-brand-400/70 hover:text-brand-ink active:scale-90 disabled:pointer-events-none disabled:opacity-25 sm:size-10'
 
   return (
     <Reveal as="section" id={category.id} className="scroll-mt-28">
-      <header className="flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <h2 className="text-xl font-extrabold sm:text-2xl">{category.title}</h2>
-          {category.note && (
-            <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--text-body)]">
-              {category.note}
-            </p>
-          )}
-        </div>
-
-        {!isDesktop && (
-          <div className="flex shrink-0 items-center gap-2 pt-1">
-            <button
-              type="button"
-              onClick={() => step(-1)}
-              disabled={atStart}
-              aria-label="قبلی"
-              className={arrow}
-            >
-              <ChevronRight className="size-4.5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => step(1)}
-              disabled={atEnd}
-              aria-label="بعدی"
-              className={arrow}
-            >
-              <ChevronLeft className="size-4.5" />
-            </button>
-          </div>
+      <header className="min-w-0">
+        <h2 className="text-xl font-extrabold sm:text-2xl">{category.title}</h2>
+        {category.note && (
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--text-body)]">
+            {category.note}
+          </p>
         )}
       </header>
 
       {isDesktop ? (
         <div className="mt-6 grid grid-cols-3 gap-4">
           {category.items.map((item) => (
-            <VariantCard key={item.id} item={item} glyph={category.glyph} />
+            <VariantCard
+              key={item.id}
+              item={item}
+              glyph={category.glyph}
+              href={variantSlug(pageId, item.id)}
+            />
           ))}
         </div>
       ) : (
-        // Kept inside the page gutter rather than bled to the screen edges:
-        // a padded scroller makes scroll-snap align to the border edge, which
-        // throws every step off by the padding.
-        <div ref={railRef} className="rail mt-6 [--rail-visible:1] sm:[--rail-visible:3]">
-          {category.items.map((item) => (
-            <VariantCard key={item.id} item={item} glyph={category.glyph} />
-          ))}
+        // A three-column row: arrow, track, arrow. The track is the only
+        // flexible column, so the arrows always sit beside the cards rather
+        // than over them, and the cards resize to whatever is left.
+        <div className="mt-6 flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => step(-1)}
+            disabled={atStart}
+            aria-label="محصول قبلی"
+            className={arrow}
+          >
+            <ChevronRight className="size-4 sm:size-4.5" />
+          </button>
+
+          {/* Kept inside the page gutter rather than bled to the screen edges:
+              a padded scroller makes scroll-snap align to the border edge,
+              which throws every step off by the padding. */}
+          <div
+            ref={railRef}
+            className="rail min-w-0 flex-1 [--rail-visible:1] sm:[--rail-visible:3]"
+          >
+            {category.items.map((item) => (
+              <VariantCard
+                key={item.id}
+                item={item}
+                glyph={category.glyph}
+                href={variantSlug(pageId, item.id)}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => step(1)}
+            disabled={atEnd}
+            aria-label="محصول بعدی"
+            className={arrow}
+          >
+            <ChevronLeft className="size-4 sm:size-4.5" />
+          </button>
         </div>
       )}
 
