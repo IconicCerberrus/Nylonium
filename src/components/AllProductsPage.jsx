@@ -7,6 +7,7 @@ import PageHero from './PageHero'
 import VariantCard from './ui/VariantCard'
 import Reveal from './ui/Reveal'
 import { allVariants } from '../data/pages'
+import { page as pageHref } from '../lib/links'
 
 /** How many tiles appear before the reader asks for more. */
 const PAGE_SIZE = 9
@@ -41,8 +42,8 @@ export default function AllProductsPage({ page }) {
           intro={page.intro}
           glyph={page.glyph}
           crumbs={[
-            { label: 'خانه', href: 'index.html' },
-            { label: page.title, href: page.slug },
+            { label: 'خانه', href: pageHref('index.html') },
+            { label: page.title, href: pageHref(page.slug) },
             { label: 'همه محصولات' },
           ]}
         />
@@ -55,7 +56,7 @@ export default function AllProductsPage({ page }) {
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {visible.map((item) => (
               <Reveal key={item.id} className="h-full">
-                <VariantCard item={item} glyph={item.glyph} />
+                <VariantCard item={item} glyph={item.glyph} href={item.href} />
               </Reveal>
             ))}
           </div>

@@ -1,23 +1,23 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowUpLeft } from 'lucide-react'
 import ProductGlyph from './ProductGlyph'
-import { useContactDialog } from './contactDialogContext'
+import { page as pageHref } from '../../lib/links'
 
 /**
  * Compact tile for one variant inside a category.
  *
  * Deliberately lighter than the landing page's ProductCard: a variant differs
  * from its siblings by two numbers, so the card shows the glyph, the name and
- * exactly those numbers. Anything longer would not survive the three-across
- * tablet layout, and the family's full story is told once on the page instead
- * of being repeated on every tile.
+ * exactly those numbers. The full write-up lives on the variant's own page,
+ * which this opens in a new tab so the reader keeps their place in the
+ * category they were browsing.
  */
-export default function VariantCard({ item, glyph }) {
-  const { openContact } = useContactDialog()
-
+export default function VariantCard({ item, glyph, href }) {
   return (
-    <article
-      onClick={() => openContact()}
-      className="group surface-glass lift-card flex h-full cursor-pointer flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-xl hover:shadow-brand-600/10"
+    <a
+      href={pageHref(href ?? item.href ?? '#')}
+      target="_blank"
+      rel="noopener"
+      className="group surface-glass lift-card flex h-full flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-xl hover:shadow-brand-600/10"
     >
       <div className="relative aspect-4/3 overflow-hidden bg-linear-to-bl from-brand-500/12 via-accent-500/8 to-transparent">
         <div
@@ -45,10 +45,10 @@ export default function VariantCard({ item, glyph }) {
         </dl>
 
         <span className="ease-soft mt-4 inline-flex items-center gap-1.5 text-[0.7rem] font-bold text-brand-ink opacity-75 transition-opacity duration-500 group-hover:opacity-100">
-          استعلام قیمت
-          <ArrowLeft className="ease-soft size-3 transition-transform duration-500 group-hover:-translate-x-1" />
+          مشاهده جزئیات
+          <ArrowUpLeft className="ease-soft size-3 transition-transform duration-500 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
         </span>
       </div>
-    </article>
+    </a>
   )
 }
