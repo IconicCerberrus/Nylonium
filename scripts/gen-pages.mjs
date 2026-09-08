@@ -16,9 +16,8 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
 
-const { productPages, allVariants, variantSlug } = await import(
-  new URL('../src/data/pages.js', import.meta.url)
-)
+const { productPages } = await import(new URL('../src/data/families/all.js', import.meta.url))
+const { allVariants, variantSlug } = await import(new URL('../src/data/pages.js', import.meta.url))
 
 /** Escapes the few characters that would break an HTML attribute. */
 const attr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')

@@ -6,18 +6,22 @@ import PageLoader from '../components/PageLoader'
 import FamilyPage from '../components/FamilyPage'
 import AllProductsPage from '../components/AllProductsPage'
 import VariantPage from '../components/VariantPage'
-import { findPage, findVariant } from '../data/pages'
+import { findVariant } from '../data/pages'
+import { loadFamily } from '../data/families'
 
 /**
  * Shared entry for every product page.
  *
- * All ten HTML shells load this one module and declare which family they are
- * and which of the two views to render through `data-page` / `data-view` on
- * the root element. That keeps a single bundle and a single place to change
- * page behaviour, instead of ten near-identical entry files.
+ * Every product shell loads this one module and declares which family it is
+ * and which view to render through `data-page` / `data-view` on the root
+ * element. That keeps a single entry and a single place to change page
+ * behaviour, instead of a hundred-odd near-identical files.
+ *
+ * The catalogue is fetched rather than bundled, so a greenhouse page
+ * downloads the greenhouse data and none of the other four.
  */
 const { page: pageId, view, variant: variantId } = document.documentElement.dataset
-const page = findPage(pageId)
+const page = await loadFamily(pageId)
 
 if (!page) {
   throw new Error(`Unknown product page: "${pageId}". Check data-page on <html>.`)
