@@ -19,6 +19,13 @@ export const emailAddresses = [
 
 const primary = phoneNumbers[0]
 
+/**
+ * Public origin, used to build the absolute URLs that canonical links,
+ * Open Graph tags and the sitemap all require. Change this once if the site
+ * moves to its own domain.
+ */
+export const siteUrl = 'https://iconiccerberrus.github.io/Nylonium'
+
 export const site = {
   name: 'نایلونیوم',
   nameLatin: 'Nylonium',
@@ -97,8 +104,8 @@ export const quoteChannels = contactChannels.filter((c) => c.id !== 'email')
 
 /**
  * Labels and order are fixed by the client — only the destinations changed
- * when each entry gained a page of its own. `home: true` marks the one link
- * that still points at a section of the landing page.
+ * when each entry gained a page of its own. A `home: true` entry would point
+ * at a section of the landing page instead; none do at the moment.
  */
 export const navLinks = [
   {
@@ -113,7 +120,7 @@ export const navLinks = [
   { label: 'نایلون شیرینک', href: 'shrink.html' },
   { label: 'کیسه نایلون', href: 'bags.html' },
   { label: 'استرچ', href: 'stretch.html' },
-  { label: 'تماس با ما', href: '#contact', home: true },
+  { label: 'تماس با ما', href: 'contact.html' },
 ]
 
 /**
