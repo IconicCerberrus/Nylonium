@@ -11,7 +11,7 @@
  * Variant pages go in product/ rather than the project root, which would
  * otherwise collect well over a hundred files.
  */
-import { mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -98,7 +98,7 @@ function shell({
 <html lang="fa" dir="rtl"${dataHome}${dataPage}${dataView}${dataVariant} data-root="${up}">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="${up}favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#059669" />
     <meta name="description" content="${attr(description)}" />
@@ -319,6 +319,10 @@ ${urls
 </urlset>
 `,
 )
+
+// The 404 is served from arbitrary URLs, so its links must be absolute.
+const notFound = readFileSync(resolve(here, '404.template.html'), 'utf8')
+writeFileSync(resolve(publicDir, '404.html'), notFound.replaceAll('{{SITE}}', siteUrl))
 
 const rootPages = readdirSync(root).filter((f) => f.endsWith('.html')).length
 console.log(

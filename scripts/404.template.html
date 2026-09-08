@@ -2,12 +2,15 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="{{SITE}}/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#059669" />
     <meta name="robots" content="noindex" />
     <title>صفحه پیدا نشد | نایلونیوم</title>
     <!--
+      Generated from scripts/404.template.html so its absolute links follow
+      siteUrl rather than a hard-coded repository path.
+
       Deliberately plain HTML with inline styles rather than the React app.
       A 404 is what a visitor sees when something has already gone wrong, so
       it should not depend on a bundle loading correctly to render.
@@ -120,8 +123,8 @@
       </p>
 
       <div class="actions">
-        <a class="primary" href="/Nylonium/">بازگشت به صفحه اصلی</a>
-        <a class="secondary" href="/Nylonium/tagheei.html">مشاهده محصولات</a>
+        <a class="primary" href="{{SITE}}/">بازگشت به صفحه اصلی</a>
+        <a class="secondary" href="{{SITE}}/tagheei.html">مشاهده محصولات</a>
       </div>
 
       <p class="code">۴۰۴</p>

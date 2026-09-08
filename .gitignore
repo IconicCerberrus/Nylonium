@@ -8,3 +8,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+public/404.html
+public/sitemap.xml
+public/robots.txt
