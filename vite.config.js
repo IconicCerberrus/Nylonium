@@ -8,13 +8,22 @@ import tailwindcss from '@tailwindcss/vite'
 // repository name as their base path. Local dev still runs at the root.
 const base = process.env.GITHUB_ACTIONS ? '/Nylonium/' : '/'
 
-// Every .html at the project root is a page. Picking them up automatically
-// means adding a family page never requires editing this file.
-const pages = Object.fromEntries(
-  readdirSync(import.meta.dirname)
+// Every .html at the project root plus every generated variant page under
+// product/. Discovering them means adding a product never requires editing
+// this file — `npm run gen` writes the shell and the build picks it up.
+const htmlIn = (dir, prefix = '') => {
+  let files = []
+  try {
+    files = readdirSync(resolve(import.meta.dirname, dir))
+  } catch {
+    return [] // product/ does not exist until the generator has run
+  }
+  return files
     .filter((f) => f.endsWith('.html'))
-    .map((f) => [f.replace(/\.html$/, ''), resolve(import.meta.dirname, f)]),
-)
+    .map((f) => [prefix + f.replace(/\.html$/, ''), resolve(import.meta.dirname, dir, f)])
+}
+
+const pages = Object.fromEntries([...htmlIn('.'), ...htmlIn('product', 'product/')])
 
 // https://vite.dev/config/
 export default defineConfig({
