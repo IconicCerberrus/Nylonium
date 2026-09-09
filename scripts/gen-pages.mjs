@@ -340,13 +340,19 @@ writeFileSync(resolve(publicDir, '404.html'), notFound.replaceAll('{{SITE}}', si
 // the tagline changes the card too.
 writeFileSync(
   resolve(publicDir, 'og.png'),
-  renderOgCard({
-    name: site.name,
-    tagline: site.tagline,
-    families: productPages.map((p) => p.title.replace(/^نایلون /, '').replace(/ نایلون$/, '')),
-    phone: phoneNumbers[0].display,
-    footnote: 'سفارش از طریق تلگرام، واتساپ و تماس تلفنی',
-  }, root),
+  await renderOgCard(
+    {
+      // The Latin name, not the Persian one: it is the wordmark, and it reads
+      // as a mark rather than as a line of text at this size.
+      wordmark: site.nameLatin.toUpperCase(),
+      tagline: site.tagline,
+      families: productPages.map((p) => p.title.replace(/^نایلون /, '').replace(/ نایلون$/, '')),
+      // Latin digits, and the leading zero kept — it is a phone number to be
+      // read off and dialled, not a quantity.
+      phone: phoneNumbers[0].raw.replace(/^\+98/, '0').replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3'),
+    },
+    root,
+  ),
 )
 
 const rootPages = readdirSync(root).filter((f) => f.endsWith('.html')).length
