@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
 import { products } from '../data/site.js'
+import { useInView } from '../hooks/useInView.js'
 
 /** Copies of the list laid end to end. Three keeps the track far wider than
  *  any viewport, so there is always more list queued past the right edge. */
@@ -23,43 +23,14 @@ const COPIES = 3
  * full, nothing blanks out, and the loop never ends.
  */
 export default function Marquee() {
-  const bandRef = useRef(null)
-  const [entered, setEntered] = useState(false)
-
-  // Start gate: a plain scroll check rather than an IntersectionObserver.
-  // If an observer ever fails to deliver its first callback the ribbon would
-  // sit frozen forever, and a frozen ribbon looks broken; a passive scroll
-  // listener has no such failure mode and costs nothing, since it detaches
-  // itself the moment the band is reached.
-  useEffect(() => {
-    const el = bandRef.current
-    if (!el) return
-
-    let frame = 0
-    const check = () => {
-      frame = 0
-      const el = bandRef.current
-      if (!el) return
-      if (el.getBoundingClientRect().top < window.innerHeight) {
-        setEntered(true)
-        window.removeEventListener('scroll', onScroll)
-        window.removeEventListener('resize', onScroll)
-      }
-    }
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(check)
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll, { passive: true })
-    check()
-
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-      if (frame) cancelAnimationFrame(frame)
-    }
-  }, [])
+  // The ribbon used to be gated by a passive scroll listener that detached
+  // itself the first time the band was reached — a one-way latch, so from
+  // then on the strip slid for the rest of the visit whether or not it was
+  // on screen. `useInView` replaces both halves: it starts the ribbon on
+  // approach and stops it again once the band is behind the reader, and it
+  // fails open, which was the reason the observer was avoided here. A frozen
+  // ribbon still looks broken; this one only ever freezes out of sight.
+  const [bandRef, inView] = useInView()
 
   const items = products.map((p) => p.title)
 
@@ -90,7 +61,7 @@ export default function Marquee() {
     >
       <div
         className="animate-marquee flex w-max motion-reduce:animate-none"
-        style={{ animationPlayState: entered ? 'running' : 'paused' }}
+        style={{ animationPlayState: inView ? 'running' : 'paused' }}
       >
         {Array.from({ length: COPIES }, (_, i) => (
           <Row key={i} hidden={i > 0} />

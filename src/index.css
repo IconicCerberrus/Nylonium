@@ -335,6 +335,18 @@
   }
 }
 
+/* Decorative loops hold still while their section is off-screen.
+   `useInView` sets the attribute; see the hook for why it fails open.
+
+   Deliberately unlayered. The `animate-*` utilities set the `animation`
+   shorthand, which resets `animation-play-state` to `running` — an unlayered
+   declaration outranks everything inside a cascade layer, so this wins
+   whatever order the utilities land in. */
+[data-motion='paused'],
+[data-motion='paused'] * {
+  animation-play-state: paused;
+}
+
 /* Reading-progress bar. Where scroll-driven animations exist this runs
    entirely off the main thread; Navbar falls back to a rAF writer otherwise. */
 .scroll-progress {

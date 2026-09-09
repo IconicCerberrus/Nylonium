@@ -678,15 +678,33 @@ checkout → setup-node 22 → npm ci → npx oxlint src → npm run build
 
 ## نکته‌ای درباره‌ی اعداد این سند
 
-بعضی چیزها در این پروژه با چشم قابل تأیید نبودند، چون پنل مرورگر ابزار توسعه گاهی
-فریم رندر نمی‌کند (`document.visibilityState` برابر `hidden`). در آن حالت
-`requestAnimationFrame` اجرا نمی‌شود و `performance.getEntriesByType('paint')` خالی
-برمی‌گردد، پس هر عدد FCP یا LCP بی‌اعتبار است.
+بعضی چیزها در این پروژه با چشم قابل تأیید نبودند، چون پنل مرورگر ابزار توسعه فریم
+رندر نمی‌کند (`document.visibilityState` برابر `hidden`).
 
-هرجا چنین محدودیتی بود، **به‌جای ادعای «تست شد»، ساختار زیرین اندازه‌گیری شد** — با
-ابزارهایی که در پنل پنهان هم درست کار می‌کنند: `performance.getEntriesByType('resource')`
-برای ترتیب و زمان‌بندی دانلودها، `getComputedStyle` برای شمردن `backdrop-filter` و
-`will-change`، `document.getAnimations()` برای انیمیشن‌های در حال اجرا، و
-`PerformanceObserver` با `buffered: true` برای CLS.
+**در آن حالت این‌ها کار نمی‌کنند و عدد غلط می‌دهند:**
 
-اعداد جدول کارایی همه از این دسته‌اند.
+| ابزار | چه اتفاقی می‌افتد |
+|---|---|
+| `requestAnimationFrame` | اصلاً اجرا نمی‌شود |
+| `performance.getEntriesByType('paint')` | خالی برمی‌گردد — هر عدد FCP/LCP بی‌اعتبار است |
+| **`IntersectionObserver`** | **حتی کال‌بک اول را هم نمی‌دهد** — پس `Reveal` و `useInView` در پنل پنهان هرگز فعال نمی‌شوند |
+| اسکرین‌شات | کادر خالی برمی‌گرداند، حتی وقتی صفحه کاملاً سالم است |
+| `setTimeout` | در تب پس‌زمینه throttle می‌شود، پس زمان‌سنجی با تایمر کش می‌آید |
+
+**اما این‌ها در پنل پنهان هم درست کار می‌کنند:**
+
+| ابزار | چه می‌دهد |
+|---|---|
+| `performance.getEntriesByType('resource')` | ترتیب و زمان‌بندی دانلودها |
+| `getComputedStyle` روی همه‌ی نودها | شمردن `backdrop-filter`، `will-change`، و **مساحت** آن‌ها |
+| `document.getAnimations()` | انیمیشن‌های در حال اجرا با `playState` |
+| `PerformanceObserver` با `buffered: true` | CLS |
+| ست کردن دستی یک صفت و خواندن `getComputedStyle` | اثبات اینکه یک قانون CSS واقعاً می‌گیرد |
+
+هرجا چنین محدودیتی بود، **به‌جای ادعای «تست شد»، ساختار زیرین اندازه‌گیری شد.**
+
+مثال از همین پروژه: توقف انیمیشن‌ها با `useInView` را نشد سرتاسری تست کرد، چون
+`IntersectionObserver` در پنل پنهان اجرا نمی‌شود. به‌جایش هر حلقه جدا اثبات شد —
+قانون CSS با ست کردن دستی صفت (۷ انیمیشن هیرو و ۲ انیمیشن CtaBand در هر دو جهت
+`paused`/`running` شدند)، مسیر inline مارکی جداگانه، و سیم‌کشی کامپوننت‌ها از روی
+باندل ساخته‌شده.
