@@ -1,5 +1,4 @@
 import ContactDialogProvider from '../context/ContactDialog'
-import PageLoader from '../layout/PageLoader'
 import Navbar from '../layout/Navbar'
 import Hero from '../sections/Hero'
 import Marquee from '../sections/Marquee'
@@ -18,7 +17,6 @@ import FloatingContact from '../layout/FloatingContact'
 export default function App() {
   return (
     <ContactDialogProvider>
-      <PageLoader />
       <Navbar />
 
       <main>

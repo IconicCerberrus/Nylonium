@@ -71,10 +71,60 @@ function preloadBodyFont() {
   }
 }
 
+/**
+ * Preloads the product catalogue a page is about to ask for.
+ *
+ * `entries/product.jsx` decides which family to import from `data-page` on
+ * `<html>`, which the browser cannot know until it has downloaded and parsed
+ * the entry — so the catalogue request only started after that, one round
+ * trip late, with nothing else in flight. On a phone that is most of a fifth
+ * of a second of waiting before the page can finish.
+ *
+ * A `modulepreload` in the shell tells the browser about the file up front,
+ * so it travels alongside the entry instead of behind it. The filename is
+ * content-hashed, so it has to be read out of the bundle rather than written
+ * into the shells by hand.
+ */
+function preloadFamilyChunk() {
+  return {
+    name: 'preload-family-chunk',
+    enforce: 'post',
+    apply: 'build',
+
+    transformIndexHtml(html, ctx) {
+      const family = html.match(/data-page="([^"]+)"/)?.[1]
+      if (!family || !ctx.bundle) return html
+
+      // Matched on the module this chunk was built from, not on its filename.
+      // Chunk names are not unique enough to match by hand: every family's
+      // catalogue produces a chunk called after the family, and a filename
+      // regex happily picked the wrong one — injecting a preload for a file
+      // that did not exist, which is a 404 on every product page.
+      const source = `/src/data/families/${family}.js`
+      const chunk = Object.values(ctx.bundle).find(
+        (c) => c.type === 'chunk' && c.facadeModuleId?.replace(/\\/g, '/').endsWith(source),
+      )
+      if (!chunk) return html
+      const file = chunk.fileName
+
+      return {
+        html,
+        tags: [
+          {
+            tag: 'link',
+            injectTo: 'head',
+            attrs: { rel: 'modulepreload', crossorigin: '', href: base + file },
+          },
+        ],
+      }
+    },
+  }
+}
+
 // https://vite.dev/config/
 export default defineConfig({
   base,
-  plugins: [react(), tailwindcss(), preloadBodyFont()],
+  plugins: [react(), tailwindcss(), preloadBodyFont(), preloadFamilyChunk()],
   build: {
     rollupOptions: { input: pages },
   },
