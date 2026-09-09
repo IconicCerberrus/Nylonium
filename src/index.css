@@ -283,11 +283,17 @@
 /* One hover contract for every raised card on the page. Both the rise and
    the settle run on the same long, soft curve, so nothing snaps on the way
    in or on the way back. */
+/* `will-change: transform` is deliberately absent. It asks the browser to
+   give the element its own compositor layer and to hold it for as long as the
+   declaration stands — and this utility is on every card, so the landing page
+   was holding 34 of them from first paint. They bought nothing: the lift only
+   runs while a pointer rests on the card, and on a touch screen it never runs
+   at all. A transition promotes the element on its own for the frames it is
+   actually moving, which is the whole of what was needed. */
 @utility lift-card {
   transition-property: transform, border-color, box-shadow, background-color;
   transition-duration: 620ms;
   transition-timing-function: var(--ease-soft);
-  will-change: transform;
 
   &:hover {
     transform: translateY(-0.5rem);
