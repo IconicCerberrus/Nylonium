@@ -1,124 +1,557 @@
-# Nylonium
+# نایلونیوم
 
-Product showcase site for Nylonium, a plastic film manufacturer.
+سایت معرفی محصولات **نایلونیوم** — تولیدکننده‌ی انواع نایلون صنعتی، کشاورزی و بسته‌بندی.
 
-This is not a storefront. Nothing is sold or paid for on the site — every call
-to action opens a dialog offering Telegram, WhatsApp or a phone call, where the
-actual conversation happens.
+🔗 **[مشاهده‌ی سایت](https://iconiccerberrus.github.io/Nylonium/)**
 
-The interface is Persian and laid out right-to-left throughout.
+۱۴۷ صفحه، تماماً فارسی و راست‌به‌چپ، بدون بک‌اند، بدون دیتابیس و بدون هیچ درخواستی به سرور شخص ثالث.
 
-## Getting started
+> **English:** Product showcase for Nylonium, an Iranian plastic film manufacturer.
+> A 147-page multi-page React/Vite site, fully Persian and RTL, with no backend.
+> Every page shell is generated from data — adding a product to a data file is all
+> it takes to get its page, its sitemap entry and its share tags. Documentation below
+> is in Persian.
+
+---
+
+## فهرست
+
+- [این سایت چیست](#این-سایت-چیست)
+- [شروع سریع](#شروع-سریع)
+- [پشته‌ی فنی](#پشتهی-فنی)
+- [چطور یک محصول اضافه کنم](#چطور-یک-محصول-اضافه-کنم)
+- [ساختار پروژه](#ساختار-پروژه)
+- [مولد صفحات](#مولد-صفحات)
+- [سیستم طراحی](#سیستم-طراحی)
+- [تاریخچه‌ی ساخت و درس‌ها](#تاریخچهی-ساخت-و-درسها)
+- [قواعدی که نباید شکسته شوند](#قواعدی-که-نباید-شکسته-شوند)
+- [کارایی](#کارایی)
+- [کارهای باز](#کارهای-باز)
+- [داده‌های نمونه](#دادههای-نمونه)
+- [انتشار](#انتشار)
+
+---
+
+## این سایت چیست
+
+### مدل کسب‌وکار — مهم‌ترین نکته
+
+این سایت **فروشگاه نیست**. هیچ خرید و پرداختی در آن انجام نمی‌شود. هدف این است که
+بازدیدکننده محصول را ببیند و برای معامله به **تلگرام** برود.
+
+این یک تصمیم معماری است، نه یک ویژگی جانبی. تقریباً همه‌ی تصمیم‌های بعدی از همین یک
+جمله بیرون آمده‌اند:
+
+- سبد خرید، حساب کاربری، قیمت و بک‌اند وجود ندارد.
+- هر دکمه‌ی «سفارش» یک پاپ‌آپ باز می‌کند که تلگرام، واتساپ و تماس تلفنی را پیشنهاد
+  می‌دهد — نه یک صفحه‌ی پرداخت.
+- تگ‌های اشتراک‌گذاری (Open Graph) از حد معمول مهم‌ترند، چون لینک‌ها در تلگرام رد و
+  بدل می‌شوند و لینک بدون OG آنجا خالی و بی‌اعتبار دیده می‌شود.
+
+### صفحات
+
+| نوع | تعداد | مسیر |
+|---|---|---|
+| صفحه‌ی اول | ۱ | `index.html` |
+| تماس با ما | ۱ | `contact.html` |
+| خانواده‌ی محصول | ۵ | `tagheei` · `greenhouse` · `shrink` · `bags` · `stretch` |
+| همه‌ی محصولات هر خانواده | ۵ | `*-all.html` |
+| تک‌محصول | ۱۳۵ | `product/<family>-<variant>.html` |
+| **مجموع** | **۱۴۷** | |
+
+**هیچ‌کدام از این HTMLها با دست نوشته نشده‌اند.** همه از داده تولید می‌شوند.
+
+### تصمیم‌های پایه
+
+| موضوع | انتخاب |
+|---|---|
+| زبان و جهت | فارسی، RTL کامل |
+| فونت | Vazirmatn Variable، میزبانی‌شده به‌صورت لوکال |
+| پالت | سبز زمردی + طوسی سرد؛ تم لایت و دارک هر دو ساخته شده |
+| استایل | مدرن، گلس/گرادیان، انیمیشن نرم |
+| کانال‌های تماس | تلگرام، واتساپ، تماس تلفنی |
+| تصاویر محصول | فعلاً ندارد — SVG اختصاصی جایش را گرفته |
+
+---
+
+## شروع سریع
 
 ```bash
 npm install
 npm run dev      # http://localhost:5183
-npm run build    # output in dist/
-npm run preview
+npm run build    # خروجی در dist/
+npm run preview  # سرو کردن خروجی build
+npm run lint     # oxlint
+npm run gen      # بازسازی شِل‌ها + sitemap + robots + صفحه ۴۰۴
 ```
 
-`npm run gen` regenerates the HTML shells, the sitemap and robots.txt. It runs
-automatically before `dev` and `build`, so you rarely need it by hand.
+`npm run gen` به‌صورت خودکار قبل از `dev` و `build` اجرا می‌شود (`predev` و
+`prebuild`)، پس تقریباً هیچ‌وقت لازم نیست دستی صدایش بزنی.
 
-## Stack
+---
 
-- **React 19** + **Vite 8**, built as a multi-page app
-- **Tailwind CSS v4** — configured entirely in `src/index.css`; there is no
-  `tailwind.config` file
-- **lucide-react** for interface icons
-- **Vazirmatn Variable**, bundled locally via `@fontsource-variable`, so the
-  page makes no third-party requests
-- No backend and no API
+## پشته‌ی فنی
 
-## How the pages are built
+| انتخاب | چرا |
+|---|---|
+| **React 19 + Vite 8** | ساخته‌شده به‌صورت **چندصفحه‌ای (MPA)**، نه SPA — هر صفحه فایل HTML خودش را دارد |
+| **Tailwind CSS v4** | کل پیکربندی داخل `src/index.css` است؛ **فایل `tailwind.config` وجود ندارد** |
+| **lucide-react** | آیکون‌های رابط کاربری |
+| **Vazirmatn Variable** | لوکال از `@fontsource-variable` — سایت هیچ درخواستی به CDN یا سرور شخص ثالث نمی‌دهد |
+| **بدون بک‌اند** | چیزی برای نگهداری، به‌روزرسانی امنیتی یا هزینه‌ی ماهانه وجود ندارد |
+| **GitHub Pages + Actions** | میزبانی رایگان، دیپلوی خودکار با هر push |
 
-There are 147 pages and none of their HTML is written by hand.
-`scripts/gen-pages.mjs` reads `src/data` and emits every shell, along with
-`public/sitemap.xml` and `public/robots.txt`. **Adding a product to the data
-file is all it takes to get its page, its sitemap entry and its share tags.**
+`framer-motion` نصب شد و بعد **حذف شد** — همان انیمیشن‌ها با CSS خالص سبک‌تر درآمدند.
 
-| Page | Source | Count |
-| --- | --- | --- |
-| Landing | `index.html` | 1 |
-| Contact | `contact.html` | 1 |
-| Product family | `tagheei.html`, `greenhouse.html`, `shrink.html`, `bags.html`, `stretch.html` | 5 |
-| Full range per family | `*-all.html` | 5 |
-| Individual variant | `product/<family>-<variant>.html` | 135 |
+---
 
-Variant pages live under `product/` so the project root does not collect a
-hundred-odd files. Each shell declares its own depth in `data-root`, and links
-built through `src/lib/links.js` use it — so a component never needs to know
-which directory it is rendered from. Only the landing page carries `data-home`.
+## چطور یک محصول اضافه کنم
 
-## Layout
+مهم‌ترین کار روزمره‌ی این پروژه. **تنها کاری که لازم است، ویرایش یک فایل داده است.**
+صفحه، لینک، ورودی sitemap و تگ‌های اشتراک‌گذاری همه خودکار ساخته می‌شوند.
+
+فایل‌های داده: `src/data/families/{tagheei,greenhouse,shrink,bags,stretch}.js`
+
+```js
+import { s, v } from './helpers.js'   // ← پسوند .js الزامی است (قاعده ۷)
+
+export default {
+  id: 'bags',                          // شناسه‌ی خانواده
+  slug: 'bags.html',                   // صفحه‌ی خانواده
+  allSlug: 'bags-all.html',            // صفحه‌ی «همه‌ی محصولات»
+  title: 'کیسه نایلون',
+  metaTitle: '…',                      // عنوان مرورگر و نتیجه‌ی گوگل
+  metaDescription: '…',                // توضیح متا
+  glyph: 'bag',                        // کدام SVG — لیست در src/ui/ProductGlyph.jsx
+  intro: '…',                          // پاراگراف بالای صفحه
+
+  categories: [
+    {
+      id: 'c-pack',
+      title: 'کیسه بسته‌بندی صنعتی',
+      note: '…',                       // یک جمله زیر عنوان دسته
+      glyph: 'bag',
+      items: [
+        //  شناسه    عنوان          توضیح کوتاه     مشخصات فنی…
+        v('bp-20', 'کیسه ۲۰×۳۰', 'قطعات کوچک',
+          s('ابعاد', '۲۰×۳۰ سانتی‌متر'),
+          s('ضخامت', '۳۰ میکرون'),
+        ),
+      ],
+    },
+  ],
+}
+```
+
+- `v(id, title, short, ...specs)` یک تنوع محصول می‌سازد
+- `s(کلید, مقدار)` یک سطر مشخصات می‌سازد
+
+هر دو در `src/data/families/helpers.js` تعریف شده‌اند. هدفشان این است که یک دسته‌ی
+نُه‌تایی در یک نگاه خوانده شود.
+
+**بعد از ویرایش** فقط `npm run dev` را اجرا کن. صفحه‌ی `product/bags-bp-20.html`
+خودش ساخته می‌شود، در sitemap می‌آید، تگ‌های OG می‌گیرد و از صفحه‌ی خانواده لینک
+می‌شود.
+
+متن‌های صفحه‌ی اول (آمار، ویژگی‌ها، نظرات، سؤالات متداول، شماره‌های تماس) در
+[`src/data/site.js`](src/data/site.js) هستند.
+
+---
+
+## ساختار پروژه
 
 ```
 src/
-  entries/    one per HTML entry point: main, product, contact
-  pages/      whole-page templates: Home, Family, AllProducts, Variant, Contact
-  sections/   page sections: Hero, Products, Features, CategorySection, …
+  entries/    نقطه‌ی ورود هر صفحه: main.jsx, product.jsx, contact.jsx
+  pages/      قالب کل صفحه: HomePage, FamilyPage, AllProductsPage,
+              VariantPage, ContactPage
+  sections/   بخش‌های صفحه: Hero, Products, Features, CategorySection,
+              Process, Faq, Testimonials, Marquee, …
   layout/     Navbar, Footer, FloatingContact, PageLoader
-  ui/         Modal, DetailDialog, ProductCard, VariantCard, Reveal, …
+  ui/         Modal, DetailDialog, ProductCard, VariantCard, Reveal,
+              ProductGlyph, Logo, SectionHeading, Avatar
   hooks/      useTheme, useMediaQuery, useRetained
-  context/    the contact dialog and its context
-  data/       site.js (landing copy) and families/ (one catalogue per family)
+  context/    پاپ‌آپ تماس و کانتکستش
+  data/       site.js (متن صفحه‌ی اول) و families/ (یک کاتالوگ برای هر خانواده)
   lib/        links.js
+scripts/      gen-pages.mjs و 404.template.html
+public/       favicon.svg و فایل‌های تولیدشده (sitemap, robots, 404)
 ```
 
-Everything a non-developer would want to change lives in
-[`src/data/site.js`](src/data/site.js) and
-[`src/data/families/`](src/data/families).
+### سه نقطه‌ی ورود برای ۱۴۷ صفحه
 
-## Design notes
+- `main.jsx` → فقط `index.html`
+- `contact.jsx` → فقط `contact.html`
+- `product.jsx` → **هر ۱۴۵ صفحه‌ی محصول**
 
-**Colour.** Emerald (`--color-brand-*`) against a cool slate neutral
-(`--color-ink-*`). Both themes are built. The visitor's choice is stored in
-`localStorage`, and a small inline script in every shell applies it before the
-first paint so the theme never flashes.
+هر شِل محصول با `data-page`، `data-view` و `data-variant` روی تگ `<html>` اعلام
+می‌کند کدام خانواده است و کدام نما را می‌خواهد (`family` / `all` / `variant`). یک
+فایل ورود به‌جای صد فایل تقریباً یکسان.
 
-**Contrast.** Use the `--brand-ink` token for brand-coloured *text*, not
-`brand-500`/`brand-600` directly. Measured against white, `brand-600` reaches
-only 3.66:1 — under the 4.5:1 WCAG AA floor for small text — so `--brand-ink`
-resolves to `brand-700` in the light theme and `brand-300` in the dark one.
-Every text token clears AA in both themes.
+### آدرس‌دهی بین صفحات
 
-**Motion.** Only `opacity` and `transform` are animated. Raised cards share one
-hover contract (`.lift-card` / `.lift-chip`). Dialogs get their entry state from
-`@starting-style` rather than a JavaScript class flip, because timing a flip by
-hand needs a frame that never arrives in a backgrounded tab. All motion is
-disabled under `prefers-reduced-motion: reduce`.
+صفحات تنوع یک پوشه پایین‌ترند (`product/`)، پس یک لینک ثابت از هر دو جا کار نمی‌کند.
+هر شِل عمق خودش را در `data-root` اعلام می‌کند و کامپوننت‌ها لینک‌ها را از
+[`src/lib/links.js`](src/lib/links.js) می‌سازند — پس **هیچ کامپوننتی لازم نیست بداند
+در کدام پوشه رندر شده است**.
 
-**Responsive.** Verified from 320px up to wide desktop with no horizontal
-scroll. Product categories are a three-column grid on desktop and a snapping
-rail below that — three cards across on a tablet, one on a phone. The rail's
-arrows sit in their own columns beside the track, so they cannot overlap a card.
+فقط `index.html` صفت `data-home` را دارد. `links.js` با همین تشخیص می‌دهد که
+`#products` باید یک هش ساده باشد یا `index.html#products`.
 
-**Loading.** One family catalogue is fetched per page rather than all five. The
-body font is preloaded by a small build plugin that reads its hashed filename
-out of the bundle.
+---
 
-## Placeholder data
+## مولد صفحات
 
-These values are stand-ins and should be replaced before launch.
+نگهداری ۱۴۷ صفحه با دست ممکن نیست. [`scripts/gen-pages.mjs`](scripts/gen-pages.mjs)
+همه را از داده می‌سازد:
 
-| Item | Where | Note |
-| --- | --- | --- |
-| Product photography | `gallery: []` throughout | Cards and variant pages render a bespoke SVG glyph in each image slot; add paths to replace |
-| `og:image` | not set | A 1200×630 PNG would make links shared in Telegram show a picture instead of text only |
-| Email | `src/data/site.js` → `emailAddresses` | Sample value |
-| Product specifications | `src/data/families/*.js` | Widths and thicknesses are representative, and must match real production capability |
-| Variant catalogue | `src/data/families/*.js` | 135 sample variants modelled on how the range is sold |
-| Customer testimonials | `src/data/site.js` → `testimonials` | Names and quotes are invented |
-| Statistics | `src/data/site.js` → `stats` | Years, order count and province coverage are sample figures |
-| Telegram link | `src/data/site.js` → `phoneNumbers` | Built as `t.me/<phone>`; a `t.me/<username>` link is more reliable if one exists |
+- ۱۴۷ شِل HTML، هر کدام با `<title>`، توضیح متا، canonical، Open Graph،
+  Twitter Card، JSON-LD و breadcrumb مخصوص خودش
+- `public/sitemap.xml` با ۱۴۷ آدرس
+- `public/robots.txt`
+- `public/404.html`
 
-## Known gaps
+دو نکته‌ی مهم:
 
-- **Variant pages share their family's prose.** Only the title, specifications
-  and intro differ between the 27 variants of a family, which search engines
-  read as duplicate content. Two or three sentences per variant would fix it.
-- **Everything renders client-side.** Pre-rendering to static HTML would cut
-  the JavaScript a visitor needs before first paint, and let crawlers read the
-  content without executing anything. It needs the browser-only code
-  (`links.js`, `useTheme`, `useMediaQuery`, `PageLoader`, `Modal`'s portal) to
-  be guarded first.
+- پوشه‌ی `product/` **هر بار از صفر ساخته می‌شود**، تا اگر شناسه‌ی یک تنوع عوض شد،
+  صفحه‌ی قدیمی جا نماند.
+- صفحه‌ی ۴۰۴ **HTML خالص است، بدون هیچ وابستگی به باندل** — چون از هر آدرس دلخواهی
+  سرو می‌شود و مسیرهای نسبی آنجا معنی ندارند.
+
+---
+
+## سیستم طراحی
+
+### رنگ — سه لایه در `src/index.css`
+
+1. **توکن‌های خام** در `@theme` — `--color-brand-*` (سبز)، `--color-accent-*`
+   (فیروزه‌ای)، `--color-ink-*` (طوسی سرد)
+2. **توکن‌های معنایی** در `:root` و `.dark` — `--surface`، `--text-strong`،
+   `--text-body`، `--line`، `--glass-bg`، `--brand-ink`
+3. **یوتیلیتی‌های مشترک** — `surface-glass`، `text-gradient`، `mesh-halo`،
+   `grid-veil`، `lift-card`، `lift-chip`، `sweep-underline`
+
+### کنتراست — اندازه‌گیری شده، نه حدس زده شده
+
+سبز `brand-600` روی سفید فقط **۳٫۶۶:۱** می‌دهد، زیر کف **۴٫۵:۱** استاندارد
+WCAG AA برای متن کوچک. توکن `--brand-ink` برای همین ساخته شد: در تم لایت به
+`brand-700` (۵٫۳۷:۱) و در دارک به `brand-300` (۱۳٫۲۶:۱) می‌رسد.
+
+### تم
+
+انتخاب کاربر در `localStorage` ذخیره می‌شود، و یک اسکریپت کوچک **داخل خودِ HTML هر
+صفحه** آن را قبل از اولین رنگ اعمال می‌کند — پس تم هیچ‌وقت پرش نمی‌کند.
+
+### حرکت
+
+فقط `opacity` و `transform` انیمیت می‌شوند تا کار روی ترد compositor بماند.
+پاپ‌آپ‌ها حالت شروعشان را از `@starting-style` می‌گیرند، نه از تغییر state در
+جاوااسکریپت. همه‌ی حرکت‌ها زیر `prefers-reduced-motion: reduce` خاموش می‌شوند.
+
+### ریسپانسیو
+
+از ۳۲۰px تا دسکتاپ عریض، بدون اسکرول افقی. دسته‌بندی محصولات روی دسکتاپ گرید
+سه‌ستونه است و پایین‌تر یک ریل اسنپ‌شونده — سه کارت روی تبلت، یکی روی موبایل.
+فلش‌های ریل در ستون خودشان کنار مسیر می‌نشینند، پس هیچ‌وقت روی کارت نمی‌افتند.
+
+---
+
+## تاریخچه‌ی ساخت و درس‌ها
+
+آنچه اینجا ثبت شده، چیزهایی است که **دوباره کشف کردنشان وقت می‌برد**.
+
+<details>
+<summary><b>مرحله ۱ — صفحه‌ی اول</b> (<code>613048c</code>)</summary>
+
+سیزده بخش: نوبار، هیرو، نوار متحرک، آمار، محصولات، چرا نایلونیوم، کاربردها،
+فرآیند سفارش، نظر مشتریان، سؤالات متداول، بنر CTA، تماس، فوتر.
+
+ده SVG اختصاصی به‌جای عکس. کنتراست اندازه‌گیری‌شده. ریسپانسیو از ۳۲۰px.
+</details>
+
+<details>
+<summary><b>مرحله ۲ — انتشار روی GitHub Pages</b> (<code>98c9ce7</code>)</summary>
+
+سه مانع که هر کدام وقت گرفتند:
+
+1. اولین push شکست خورد — نام کاربری `IconicCerberrus` است با **دو تا R**.
+2. مخزن به `Nylonium.io.github` تغییر نام داده شده بود و روی Pages یک دامنه‌ی
+   اختصاصی ست شده بود که دامنه‌ی واقعی نبود. برگردانده شد به `Nylonium` و CNAME
+   حذف شد.
+3. صفحه سیاه بود، چون Pages فایل‌های خام مخزن را سرو می‌کرد. با ورک‌فلوی Actions
+   که `dist/` را منتشر می‌کند حل شد.
+</details>
+
+<details>
+<summary><b>مرحله ۳ — همه‌چیز به پاپ‌آپ</b> (<code>5e66b0d</code>)</summary>
+
+هر کارتی که قبلاً مستقیم به بیرون لینک می‌داد، حالا اول یک پاپ‌آپ باز می‌کند.
+دلیلش صریح بود: کاربر ممکن است فقط کنجکاو باشد و نخواهد ناگهان تماس گرفته شود، و
+ممکن است چند شماره داشته باشیم که باید بینشان انتخاب کند.
+
+سه قطعه‌ی مشترک ساخته شد:
+
+- **`Modal`** — دیالوگ وسط‌چین با Escape، کلیک روی پس‌زمینه، قفل اسکرول، تله فوکوس
+  و بازگشت فوکوس
+- **`DetailDialog`** — بدنه‌ی مشترک محصولات، مراحل، ویژگی‌ها، صنایع و نظرات
+- **`ContactDialog`** — کانال‌ها به‌صورت ردیف‌های بازشونده
+</details>
+
+<details>
+<summary><b>مرحله ۴ — سه باگ پاپ‌آپ</b> (<code>4555c3f</code>) ← مهم‌ترین درس‌های فنی پروژه</summary>
+
+**پاپ‌آپ وسط صفحه نمی‌آمد.** داخل `Reveal` رندر می‌شد و `Reveal` یک `translate`
+دارد. **هر ancestor با transform برای `position: fixed` یک containing block
+می‌سازد** — پس پاپ‌آپ داخل کارت حبس می‌شد. با `createPortal` روی `document.body`
+حل شد.
+
+**موقع بستن یک قاب خالی نشان می‌داد.** با زدن ✕ محتوا فوراً پاک می‌شد ولی انیمیشن
+خروج ۴۰۰ms طول می‌کشید. هوک `useRetained` محتوا را تا پایان انیمیشن نگه می‌دارد.
+
+**بار اول هیچ انیمیشنی دیده نمی‌شد.** انیمیشن ورود نیاز به یک فریم بین «مانت در
+حالت بسته» و «حالت باز» دارد، و آن فریم در تب پس‌زمینه هیچ‌وقت نمی‌رسد. با
+`@starting-style` حالت شروع به خود CSS سپرده شد؛ دیگر هیچ زمان‌بندی جاوااسکریپتی
+در کار نیست.
+</details>
+
+<details>
+<summary><b>مرحله ۵ — MPA و صفحه برای هر آیتم نوبار</b> (<code>eba571b</code>)</summary>
+
+بررسی سایت رقیب نشان داد صفحه‌ی دسته‌بندی‌شان ۱۱٬۲۶۰ پیکسل ارتفاع دارد و زیر گرید
+محصولات یک مقاله‌ی ۱۴ هزار کاراکتری چسبانده‌اند که خریدار باید از رویش رد شود.
+
+**انتخاب ما: متن بعد از دسته‌بندی‌ها، نه قبلش.** کسی که می‌داند چه می‌خواهد هرگز
+مجبور نیست از آن رد شود.
+</details>
+
+<details>
+<summary><b>مرحله ۶ — ۱۳۵ صفحه‌ی محصول</b> (<code>400c9f0</code>, <code>3e48402</code>)</summary>
+
+هر تنوع صفحه‌ی خودش را گرفت. چیدمان: چهار تصویر شناور سمت چپ در نصف عرض، متن از
+راست دورشان می‌پیچد، و بعد از تمام شدن تصاویر تمام عرض را می‌گیرد.
+
+`scripts/gen-pages.mjs` در همین مرحله نوشته شد.
+</details>
+
+<details>
+<summary><b>مرحله ۷ — بهینه‌سازی</b> (<code>2aeab05</code>, <code>00eae9c</code>)</summary>
+
+**تفکیک داده‌ی هر خانواده.** قبلاً هر صفحه‌ی محصول هر پنج کاتالوگ را باندل می‌کرد.
+صرفه‌جویی حجم انتقال **فقط ۳KB بود، نه ۱۰–۱۲KB که تخمین زده شده بود** — چون gzip از
+قبل تکرار بین کاتالوگ‌های هم‌شکل را حذف کرده بود و محاسبه روی حجم خام انجام شده بود.
+**برد واقعی جای دیگری بود:** هر صفحه حالا ۹KB کاتالوگ را parse می‌کند به‌جای ۴۶KB،
+و gzip به آن کمکی نمی‌کند.
+
+**preload فونت** با یک پلاگین کوچک build که نام hash‌شده را از bundle می‌خواند
+(`preloadBodyFont` در `vite.config.js`).
+
+**سقف پرده‌ی لودینگ** از ۲۲۰۰ به ۸۰۰ میلی‌ثانیه.
+
+**`content-visibility` پیاده و برگردانده شد.** تخمین ارتفاع ۴۱۶px بود ولی ارتفاع
+واقعی روی موبایل ۷۹۲px درآمد — یعنی ۱۱۰۰px پرش اسکرول‌بار.
+</details>
+
+<details>
+<summary><b>مرحله ۸ — سئو و ممیزی</b> (<code>77be716</code> تا <code>d6190b0</code>)</summary>
+
+canonical، Open Graph، Twitter Card و JSON-LD روی هر ۱۴۷ صفحه. sitemap، robots،
+صفحه‌ی ۴۰۴، صفحه‌ی تماس، و بازسازی ساختار پوشه‌ها.
+
+**باگی که ممیزی پیدا کرد:** فاوآیکون روی هر ۱۴۷ صفحه ۴۰۴ می‌داد. آدرسش
+`/favicon.svg` بود و **Vite مسیرهای مطلق `public/` را بازنویسی نمی‌کند**، پس به
+ریشه‌ی دامنه اشاره می‌کرد نه به `/Nylonium/`.
+</details>
+
+---
+
+## قواعدی که نباید شکسته شوند
+
+اینها تصمیم‌های عمدی‌اند، نه سلیقه. شکستنشان چیزی را خراب می‌کند.
+
+1. **برای متن سبز از `--brand-ink` استفاده کن**، نه `brand-500/600`. آن دو کنتراست
+   AA را ندارند.
+
+2. **`.rail` نباید `--rail-visible` بگیرد.** آن قانون unlayered است و بر یوتیلیتی
+   ریسپانسیو غلبه می‌کند و همه‌ی بریک‌پوینت‌ها را روی یک کارت قفل می‌کند. مقدار
+   پیش‌فرض داخل `calc()` است.
+
+3. **ریل نباید padding افقی بگیرد.** `scroll-snap` به لبه‌ی border تراز می‌کند و هر
+   پرش به اندازه‌ی padding خطا می‌خورد.
+
+4. **پاپ‌آپ‌ها باید portal بمانند.** هر ancestor با transform آنها را حبس می‌کند.
+
+5. **فقط `opacity` و `transform` انیمیت شوند** تا کار روی ترد compositor بماند — **و
+   هرگز روی المانی که `backdrop-filter` دارد.** آن ترکیب مزیت compositor را کامل از
+   بین می‌برد، چون هر فریم پس‌زمینه باید دوباره تار شود.
+
+6. **مسیر فایل‌های `public/` را مطلق ننویس.** Vite بازنویسی‌شان نمی‌کند و روی
+   `/Nylonium/` می‌شکنند.
+
+7. **در `src/data/families/` پسوند `.js` را در import بنویس.** مولد صفحات در Node
+   خام اجرا می‌شود و مسیرها را تحت‌اللفظی resolve می‌کند.
+
+8. **وقتی تصاویر واقعی اضافه شدند:** هر `<img>` باید `width` و `height` داشته باشد،
+   `loading="lazy"` بگیرد و فرمتش WebP یا AVIF باشد. الان **CLS سایت صفر است** — با
+   اولین تصویر بدون ابعاد خراب می‌شود.
+
+---
+
+## کارایی
+
+اندازه‌گیری روی خروجی `dist` با `vite preview`:
+
+| مورد | مقدار |
+|---|---|
+| JS صفحه‌ی اول | ۳۰۷KB خام / **~۹۴KB gzip** |
+| JS صفحه‌ی محصول | ۲۹۲KB خام / **~۹۰KB gzip** |
+| CSS | ۷۹KB خام / ۱۳KB gzip |
+| فونت | ۴۶KB (عربی) + ۳۴٫۵KB (لاتین) + ۲۲KB (لاتین گسترده) |
+| المان با `backdrop-filter` در صفحه‌ی اول | ~۶۰ |
+| المان با `will-change` دائمی | ۳۴ |
+| انیمیشن بی‌نهایت در حال اجرا | ۱۱ |
+| ارتفاع صفحه‌ی اول / تعداد نود | ۲۹٬۰۰۹px / ۱۵۸۰ |
+| **CLS** | **۰** ✅ |
+
+### ممیزی دسترس‌پذیری و سئو
+
+| بررسی | نتیجه |
+|---|---|
+| لینک داخلی معیوب | ۰ از ۱۴۷ |
+| عنوان یا توضیح متا تکراری | ۰ |
+| صفحه بدون `lang` / `dir` | ۰ |
+| تصویر بدون `alt` | ۰ |
+| دکمه بدون نام دسترس‌پذیر | ۰ |
+| کنتراست متن (هر دو تم) | همه بالای AA |
+
+### تشخیص
+
+**حجم دانلود مشکل نیست** — ۹۴KB فشرده برای یک سایت React قابل قبول است. دو مشکل
+واقعی اینهاست:
+
+1. **مرورگر کار اضافه‌ی زیادی می‌کند** → اسکرول کند و گرم شدن گوشی
+2. **کاربر بی‌دلیل منتظر می‌ماند** → محتوا آماده است ولی دیر نشان داده می‌شود
+
+جزئیات و راه‌حل‌ها در بخش بعد.
+
+---
+
+## کارهای باز
+
+### اولویت یک — کم‌ریسک، تأثیر زیاد
+
+**`backdrop-filter` روی ~۶۰ المان.** `surface-glass` روی هر `ProductCard` می‌نشیند
+(`blur(20px) saturate(1.6)`). یک پس‌زمینه‌ی ساده یک‌بار کشیده می‌شود؛ شیشه‌ی مات یعنی
+مرورگر باید **در هر فریم، برای هر المان** پشت آن را دوباره نمونه‌برداری و تار کند.
+موقع اسکرول این سنگین‌ترین هزینه‌ی رندر سایت است.
+→ شیشه فقط برای نوبار و چند المان خاص؛ کارت‌ها پس‌زمینه‌ی نیمه‌شفاف ساده.
+
+**`will-change: transform` دائمی در `.lift-card`.** مرورگر برای هر المان یک بوم جدا
+در حافظه‌ی GPU می‌سازد و نگه می‌دارد — ۳۴ تا از لحظه‌ی لود، برای افکتی که فقط روی
+hover اتفاق می‌افتد و روی موبایل اصلاً hover وجود ندارد.
+→ `@media (hover: hover) { .lift-card:hover { will-change: transform } }`
+
+**پرده‌ی لودینگ.** محتوا زودتر از پرده آماده است، ولی `PageLoader` حداقل ۱۲۰ms صبر
+می‌کند و بعد ۷۰۰ms محو می‌شود، و در این مدت اسکرول قفل است.
+→ یا حذف و جایگزینی با `font-display: optional`، یا سقف ۳۰۰ms و محو ۲۵۰ms.
+
+**subset لاتین فونت.** `@import '@fontsource-variable/vazirmatn'` هر سه زیرمجموعه را
+می‌آورد. سایت فارسی است ولی لاتین (۳۴٫۵KB) دانلود می‌شود — آن هم در موج دوم، پس بعد
+از نمایش متن یک بار دیگر فونت عوض می‌شود.
+→ فقط زیرمجموعه‌ی لازم import شود؛ ۵۶KB کمتر.
+
+**انیمیشن‌های بی‌نهایت.** ۶ تا `float`، ۳ تا `drift` (دو دایره‌ی ۸۹۶px و ۱۰۴۵px که
+مدام می‌چرخند)، `marquee` و `slow-ping` — همه بی‌وقفه، حتی وقتی از دید خارج‌اند.
+بدتر از همه، آن ۶ تا `float` روی المان‌های شیشه‌ای‌اند و قاعده ۵ را نقض می‌کنند.
+→ با `IntersectionObserver` و `animation-play-state: paused` متوقف شوند.
+
+### اولویت دو — تأثیر زیاد، کار بیشتر
+
+**زنجیره‌ی انتظار در صفحات محصول.** `await loadFamily(pageId)` به‌صورت top-level در
+`src/entries/product.jsx` است، پس chunk خانواده **بعد از** دانلود و پارس entry شروع
+می‌شود. روی اینترنت موبایل یک رفت‌وبرگشت کامل (~۲۰۰ms) قبل از هر رندری.
+→ تزریق `<link rel="modulepreload">` در هر شِل، با همان ترفند پلاگین preload فونت.
+
+**پیش‌رندر ایستا (SSG).** فایل HTML هر ۱۴۷ صفحه **خالی** است — فقط `<div id="root">`.
+تا ۹۴KB جاوااسکریپت دانلود و اجرا نشود، هیچ متنی وجود ندارد.
+
+> **تفکیک مهم:** تگ‌های OG و JSON-LD داخل HTML هستند، پس تلگرام و ربات‌های
+> اشتراک‌گذاری همین حالا هم درست کار می‌کنند. آنچه SSG اضافه می‌کند: ایندکس شدن
+> **متن بدنه** توسط گوگل بدون اجرای جاوااسکریپت، و نصف شدن زمان اولین رنگ.
+
+پیش‌نیاز: کدهای فقط-مرورگر باید اول محافظت شوند — `links.js`، `useTheme`،
+`useMediaQuery`، `PageLoader` و portal مربوط به `Modal`.
+
+**`og:image`.** تنظیم نشده؛ یک PNG ۱۲۰۰×۶۳۰ لازم است. چون کل قیف فروش به تلگرام
+می‌رود، این کم‌زحمت‌ترین کار با بیشترین اثر تجاری است.
+
+**محتوای تکراری در ۱۳۵ صفحه‌ی تنوع.** فقط عنوان، مشخصات و مقدمه فرق می‌کنند.
+`noindex` راه‌حل ارزانی است ولی پیشنهاد نمی‌شود: آن صفحات دقیقاً همان چیزی را هدف
+می‌گیرند که خریدار واقعی در گوگل تایپ می‌کند («نایلون گلخانه‌ای ۶ متری»، «استرچ ۲۳
+میکرون») و این دُم بلند جستجو ارزشمندترین ترافیک یک تولیدکننده است.
+→ دو یا سه جمله‌ی اختصاصی برای هر تنوع؛ کار یک بعدازظهر، و هر ۱۳۵ صفحه می‌ماند.
+
+### اولویت سه
+
+- **`content-visibility`** قبلاً امتحان و برگردانده شد، ولی علت شکست قابل حل است:
+  مشکل از `contain-intrinsic-size` با عدد ثابت بود. با `contain-intrinsic-size:
+  auto 416px` مرورگر ارتفاع واقعی را بعد از اولین رندر به خاطر می‌سپارد و آن ۱۱۰۰px
+  پرش از بین می‌رود.
+- **`Navbar`** روی هر رویداد اسکرول `setScrolled` صدا می‌زند → sentinel و
+  `IntersectionObserver`.
+- **`useMediaQuery`** به ازای هر instance یک listener روی `resize` می‌گذارد.
+- **`product.jsx`** هر سه کامپوننت صفحه را eager import می‌کند، در حالی که هر صفحه
+  فقط یکی را استفاده می‌کند.
+- **chunk مشترک ۲۶۱KB** — React و کل کد مشترک در یک فایل. با `manualChunks` وندور
+  جدا شود تا هر تغییر کد اپ، کش React را باطل نکند.
+- **`public/sitemap.xml`، `robots.txt` و `404.html`** در `.gitignore` هستند ولی
+  track شده‌اند. چون sitemap تاریخ روز را داخلش می‌نویسد، هر build یک diff ۲۹۴ خطی
+  بی‌معنی می‌سازد.
+
+---
+
+## داده‌های نمونه
+
+این مقادیر جای‌گیرند و باید قبل از تحویل نهایی جایگزین شوند:
+
+| مورد | کجا |
+|---|---|
+| تصاویر محصولات | `gallery: []` در همه‌جا — فعلاً SVG اختصاصی نمایش داده می‌شود |
+| ایمیل | `src/data/site.js` → `emailAddresses` |
+| مشخصات فنی | `src/data/families/*.js` — بازه‌های عرض و ضخامت تخمینی‌اند و **باید با توان واقعی تولید بخوانند** |
+| کاتالوگ ۱۳۵ تنوع | `src/data/families/*.js` — نمونه، بر اساس عرف بازار |
+| نظرات مشتریان | `src/data/site.js` → `testimonials` — نام‌ها ساختگی |
+| آمار | `src/data/site.js` → `stats` — سال تأسیس، تعداد سفارش و پوشش استانی نمونه‌اند |
+| لینک تلگرام | `src/data/site.js` → `phoneNumbers` — به‌صورت `t.me/<شماره>` ساخته می‌شود؛ اگر یوزرنیم دارید مطمئن‌تر است |
+
+---
+
+## انتشار
+
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) با هر push روی `main`
+اجرا می‌شود:
+
+```
+checkout → setup-node 22 → npm ci → npx oxlint src → npm run build
+        → upload dist/ → deploy to GitHub Pages
+```
+
+`base` در [`vite.config.js`](vite.config.js) وقتی متغیر `GITHUB_ACTIONS` ست باشد
+`/Nylonium/` می‌شود و در حالت محلی `/`. دقیقاً به همین دلیل بود که فاوآیکون با مسیر
+مطلق می‌شکست — قاعده ۶ را ببین.
+
+---
+
+## نکته‌ای درباره‌ی اعداد این سند
+
+بعضی چیزها در این پروژه با چشم قابل تأیید نبودند، چون پنل مرورگر ابزار توسعه گاهی
+فریم رندر نمی‌کند (`document.visibilityState` برابر `hidden`). در آن حالت
+`requestAnimationFrame` اجرا نمی‌شود و `performance.getEntriesByType('paint')` خالی
+برمی‌گردد، پس هر عدد FCP یا LCP بی‌اعتبار است.
+
+هرجا چنین محدودیتی بود، **به‌جای ادعای «تست شد»، ساختار زیرین اندازه‌گیری شد** — با
+ابزارهایی که در پنل پنهان هم درست کار می‌کنند: `performance.getEntriesByType('resource')`
+برای ترتیب و زمان‌بندی دانلودها، `getComputedStyle` برای شمردن `backdrop-filter` و
+`will-change`، `document.getAnimations()` برای انیمیشن‌های در حال اجرا، و
+`PerformanceObserver` با `buffered: true` برای CLS.
+
+اعداد جدول کارایی همه از این دسته‌اند.
