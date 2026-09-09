@@ -17,7 +17,7 @@ export default function VariantCard({ item, glyph, href }) {
       href={pageHref(href ?? item.href ?? '#')}
       target="_blank"
       rel="noopener"
-      className="group surface-glass lift-card flex h-full flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-xl hover:shadow-brand-600/10"
+      className="group surface-panel lift-card flex h-full flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-xl hover:shadow-brand-600/10"
     >
       <div className="relative aspect-4/3 overflow-hidden bg-linear-to-bl from-brand-500/12 via-accent-500/8 to-transparent">
         <div

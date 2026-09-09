@@ -81,7 +81,7 @@ function FilmArtwork() {
 function SpecChip({ children, className = '', delay = '0s' }) {
   return (
     <div
-      className={`surface-glass animate-float absolute rounded-2xl px-3.5 py-2.5 shadow-xl shadow-ink-950/10 dark:shadow-black/40 ${className}`}
+      className={`surface-panel animate-float absolute rounded-2xl px-3.5 py-2.5 shadow-xl shadow-ink-950/10 dark:shadow-black/40 ${className}`}
       style={{ animationDelay: delay }}
     >
       {children}
