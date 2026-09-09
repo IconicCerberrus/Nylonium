@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { isBrowser } from '../lib/browser.js'
 
 const STORAGE_KEY = 'nylonium-theme'
 
@@ -8,8 +9,12 @@ const STORAGE_KEY = 'nylonium-theme'
  * flash of the wrong theme, so this hook only mirrors and updates that state.
  */
 export function useTheme() {
+  // The build-time pass has no stored preference and no OS to ask, so it
+  // renders the light-theme toggle. Nothing else depends on this: the themes
+  // are CSS custom properties, so the same markup serves both and only the
+  // toggle's own icon differs.
   const [theme, setTheme] = useState(() =>
-    document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+    isBrowser && document.documentElement.classList.contains('dark') ? 'dark' : 'light',
   )
 
   useEffect(() => {

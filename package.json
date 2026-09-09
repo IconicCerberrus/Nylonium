@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "gen": "node scripts/gen-pages.mjs",
     "predev": "npm run gen",
-    "prebuild": "npm run gen"
+    "prebuild": "npm run gen",
+    "ssr-check": "node scripts/ssr-check.mjs"
   },
   "dependencies": {
     "@fontsource-variable/vazirmatn": "^5.3.0",
@@ -21,10 +22,13 @@
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@fontsource/outfit": "^5.3.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
     "oxlint": "^1.75.0",
-    "vite": "^8.2.0"
+    "vite": "^8.2.0",
+    "wawoff2": "^2.0.1"
   }
 }

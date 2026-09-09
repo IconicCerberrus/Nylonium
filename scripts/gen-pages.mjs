@@ -15,6 +15,8 @@ import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'nod
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { OG_HEIGHT, OG_WIDTH, renderOgCard } from './og-card.mjs'
+
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '..')
 
@@ -111,9 +113,16 @@ function shell({
     <meta property="og:title" content="${attr(title)}" />
     <meta property="og:description" content="${attr(description)}" />
     <meta property="og:url" content="${attr(url)}" />
-    <meta name="twitter:card" content="summary" />
+    <!-- Absolute, and it has to be: the crawler that reads this is not the
+         browser that loaded the page, so it has no base to resolve against. -->
+    <meta property="og:image" content="${attr(abs('og.png'))}" />
+    <meta property="og:image:width" content="${OG_WIDTH}" />
+    <meta property="og:image:height" content="${OG_HEIGHT}" />
+    <meta property="og:image:alt" content="${attr(site.name)} — ${attr(site.tagline)}" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${attr(title)}" />
     <meta name="twitter:description" content="${attr(description)}" />
+    <meta name="twitter:image" content="${attr(abs('og.png'))}" />
 
 ${jsonLd(graph)}
     <script>
@@ -323,6 +332,28 @@ ${urls
 // The 404 is served from arbitrary URLs, so its links must be absolute.
 const notFound = readFileSync(resolve(here, '404.template.html'), 'utf8')
 writeFileSync(resolve(publicDir, '404.html'), notFound.replaceAll('{{SITE}}', siteUrl))
+
+// ── Share card ────────────────────────────────────────────────────────
+// Every conversation about this business starts with a link pasted into a
+// chat, so the card is not decoration — it is the first thing most visitors
+// see of the site. Rendered from src/data like everything else, so changing
+// the tagline changes the card too.
+writeFileSync(
+  resolve(publicDir, 'og.png'),
+  await renderOgCard(
+    {
+      // The Latin name, not the Persian one: it is the wordmark, and it reads
+      // as a mark rather than as a line of text at this size.
+      wordmark: site.nameLatin.toUpperCase(),
+      tagline: site.tagline,
+      families: productPages.map((p) => p.title.replace(/^نایلون /, '').replace(/ نایلون$/, '')),
+      // Latin digits, and the leading zero kept — it is a phone number to be
+      // read off and dialled, not a quantity.
+      phone: phoneNumbers[0].raw.replace(/^\+98/, '0').replace(/(\d{4})(\d{3})(\d{4})/, '$1 $2 $3'),
+    },
+    root,
+  ),
+)
 
 const rootPages = readdirSync(root).filter((f) => f.endsWith('.html')).length
 console.log(

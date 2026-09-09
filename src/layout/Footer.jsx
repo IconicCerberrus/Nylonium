@@ -1,6 +1,6 @@
 import { ArrowUp, Mail, MessageCircle, Phone, Send } from 'lucide-react'
 import Logo from '../ui/Logo'
-import { home } from '../lib/links.js'
+import { home, page as pageHref } from '../lib/links.js'
 import { contact, navLinks, products, site } from '../data/site.js'
 
 const quickLinks = [
@@ -155,14 +155,18 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Nav mirror for crawlers — keeps every nav target in the DOM once more. */}
+      {/* Nav mirror for crawlers — keeps every nav target in the DOM once more.
+          Same rule as the navbar: navLinks hrefs are relative to the project
+          root, so they go through page() or they break from product/. This
+          list is the one a crawler follows, which made getting it wrong worse
+          here than anywhere else on the page. */}
       <nav className="sr-only" aria-label="نقشه سایت">
         <ul>
           {navLinks
             .flatMap((l) => [l, ...(l.children ?? [])])
             .map((l) => (
               <li key={`${l.label}-${l.href}`}>
-                <a href={l.home ? home(l.href) : l.href}>{l.label}</a>
+                <a href={l.home ? home(l.href) : pageHref(l.href)}>{l.label}</a>
               </li>
             ))}
         </ul>
