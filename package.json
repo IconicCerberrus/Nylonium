@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "gen": "node scripts/gen-pages.mjs",
     "predev": "npm run gen",
-    "prebuild": "npm run gen"
+    "prebuild": "npm run gen",
+    "ssr-check": "node scripts/ssr-check.mjs"
   },
   "dependencies": {
     "@fontsource-variable/vazirmatn": "^5.3.0",
