@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import { isBrowser } from '../lib/browser.js'
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -95,7 +96,11 @@ export default function Modal({
     [onClose],
   )
 
-  if (!mounted) return null
+  // A dialog is closed at build time, so `mounted` already short-circuits the
+  // prerender pass. The explicit check is here so that a caller who ever does
+  // render one open on the server gets nothing rather than a crash inside
+  // createPortal, which has no document.body to reach for.
+  if (!mounted || !isBrowser) return null
 
   return createPortal(
     <div

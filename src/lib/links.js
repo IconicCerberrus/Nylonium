@@ -6,12 +6,35 @@
  * from a product page the same target has to name the file first, otherwise
  * the browser looks for a section that is not there.
  */
+import { isBrowser } from './browser.js'
+
+/**
+ * Where the page being rendered sits, for the build-time pass.
+ *
+ * In the browser both facts are read off `<html>`, which the shell has always
+ * carried. Rendering in Node has no `<html>` to read, so the prerenderer says
+ * which page it is about to render before it renders it. The values have to
+ * agree between the two passes or every link in the static markup would
+ * differ from the one React builds on hydration.
+ *
+ * Module-level rather than context because prerendering is sequential — one
+ * page is rendered to a string at a time — and threading a provider through
+ * every page component to carry two strings would be worse.
+ */
+let building = { root: '', home: false }
+
+/** Called by the prerenderer before each page. No effect in the browser. */
+export function setPageContext({ root: r = '', home = false } = {}) {
+  building = { root: r, home }
+}
+
 /**
  * Only index.html carries `data-home`. Testing for it beats inferring from a
  * missing product id — the contact page has no product either, and inferring
  * left its in-page anchors pointing at sections it does not contain.
  */
-const onHome = () => document.documentElement.dataset.home !== undefined
+const onHome = () =>
+  isBrowser ? document.documentElement.dataset.home !== undefined : building.home
 
 /**
  * Prefix that walks back up to the project root.
@@ -21,7 +44,7 @@ const onHome = () => document.documentElement.dataset.home !== undefined
  * without the components needing to know where they are.
  */
 export function root() {
-  return document.documentElement.dataset.root ?? ''
+  return isBrowser ? (document.documentElement.dataset.root ?? '') : building.root
 }
 
 /** A page at the project root, addressed correctly from anywhere. */
