@@ -29,7 +29,7 @@ export default function ProductCard({ product, delay = 0, anchored = true, revea
       <article
         id={anchored ? product.id : undefined}
         onClick={() => setOpen(true)}
-        className="group surface-glass lift-card relative flex h-full cursor-pointer scroll-mt-28 flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-2xl hover:shadow-brand-600/10"
+        className="group surface-panel lift-card relative flex h-full cursor-pointer scroll-mt-28 flex-col overflow-hidden rounded-3xl text-right hover:border-brand-400/60 hover:shadow-2xl hover:shadow-brand-600/10"
       >
         {/* Illustration panel — the slot real photography will take over. */}
         <div className="relative aspect-16/10 overflow-hidden bg-linear-to-bl from-brand-500/12 via-accent-500/8 to-transparent">

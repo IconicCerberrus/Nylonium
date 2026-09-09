@@ -2,13 +2,21 @@ import { MessageCircle, Phone, Send } from 'lucide-react'
 import Reveal from '../ui/Reveal'
 import { useContactDialog } from '../context/contactDialogContext.js'
 import { contact } from '../data/site.js'
+import { useInView } from '../hooks/useInView.js'
 
 /** Full-bleed conversion band sitting between the FAQ and the contact block. */
 export default function CtaBand() {
   const { openContact } = useContactDialog()
+  // Two rings the width of the band turn continuously. The band sits far down
+  // a 29,000px page, so they spend most of a visit turning out of sight.
+  const [motionRef, inView] = useInView()
 
   return (
-    <section className="px-4 py-16 sm:px-6 sm:py-20">
+    <section
+      ref={motionRef}
+      data-motion={inView ? undefined : 'paused'}
+      className="px-4 py-16 sm:px-6 sm:py-20"
+    >
       <Reveal className="relative isolate mx-auto max-w-7xl overflow-hidden rounded-4xl bg-linear-to-bl from-brand-700 via-brand-600 to-accent-700 px-6 py-14 text-center shadow-2xl shadow-brand-700/25 sm:rounded-5xl sm:px-12 sm:py-20">
         {/* Decorative drifting rings */}
         <svg

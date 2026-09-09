@@ -1,6 +1,7 @@
 import { ArrowLeft, Send, Sparkles } from 'lucide-react'
 import { useContactDialog } from '../context/contactDialogContext.js'
 import { products } from '../data/site.js'
+import { useInView } from '../hooks/useInView.js'
 
 /**
  * Animated film stack: three translucent sheets drifting over each other,
@@ -81,7 +82,7 @@ function FilmArtwork() {
 function SpecChip({ children, className = '', delay = '0s' }) {
   return (
     <div
-      className={`surface-glass animate-float absolute rounded-2xl px-3.5 py-2.5 shadow-xl shadow-ink-950/10 dark:shadow-black/40 ${className}`}
+      className={`surface-panel animate-float absolute rounded-2xl px-3.5 py-2.5 shadow-xl shadow-ink-950/10 dark:shadow-black/40 ${className}`}
       style={{ animationDelay: delay }}
     >
       {children}
@@ -92,9 +93,17 @@ function SpecChip({ children, className = '', delay = '0s' }) {
 export default function Hero() {
   const { openContact } = useContactDialog()
   const highlights = products.filter((p) => p.featured).slice(0, 3)
+  // The drifting guide ring and the floating chips loop forever. Once the
+  // reader has scrolled past the opening screen there is nothing to see.
+  const [motionRef, inView] = useInView()
 
   return (
-    <section id="top" className="relative isolate overflow-hidden">
+    <section
+      id="top"
+      ref={motionRef}
+      data-motion={inView ? undefined : 'paused'}
+      className="relative isolate overflow-hidden"
+    >
       {/* Layered backdrop */}
       <div className="mesh-halo absolute inset-0 -z-20" aria-hidden="true" />
       <div className="grid-veil absolute inset-0 -z-10 opacity-70" aria-hidden="true" />
