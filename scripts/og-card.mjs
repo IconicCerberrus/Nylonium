@@ -12,16 +12,35 @@
  * needs Arabic shaping, and there is no guarantee about the fonts installed
  * on whichever machine runs the build.
  *
- * Every string on the card is Persian on purpose. Fontsource ships Vazirmatn
- * as three subset files that all declare the same family name, so the
- * renderer resolves the family to one of them and Latin characters come out
- * of the Arabic subset as garbage rather than as letters. Keeping the card
- * Persian sidesteps that entirely; if a Latin line is ever wanted here, it
- * needs a font file that carries both scripts.
+ * Two typefaces, and the split is not decorative. Fontsource ships Vazirmatn
+ * as subset files that all declare the *same* family name, so a renderer
+ * asked for "Vazirmatn" resolves to whichever it loaded first and Latin
+ * characters come back out of the Arabic subset as garbage. Outfit carries a
+ * family name of its own, so naming it explicitly on the Latin runs resolves
+ * them to a font that actually has those letters — and it is a better
+ * wordmark face than a text font set large.
+ *
+ * Rule for editing this file: Persian text names Vazirmatn, Latin text names
+ * Outfit, and no run mixes the two scripts.
+ *
+ * Three things about the renderer were learned the hard way and are all load
+ * bearing:
+ *
+ *   - `fontBuffers` does not exist in this version of resvg-js. Passing it is
+ *     silently ignored, and every glyph then comes from a system font — which
+ *     means the card looked right on a Windows machine and would have come
+ *     out as something else entirely on the Linux runner that builds it.
+ *     Fonts have to arrive as `fontFiles` paths.
+ *   - resvg does not apply variable-font weight axes, so a variable file set
+ *     to weight 800 renders at its default instance. The static per-weight
+ *     files are used instead, one file per weight actually drawn.
+ *   - Fontsource ships woff2, resvg wants a plain sfnt, so each file is
+ *     decompressed once into node_modules/.cache and reused after that.
  */
-import { readFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { Resvg } from '@resvg/resvg-js'
+import { decompress } from 'wawoff2'
 
 const WIDTH = 1200
 const HEIGHT = 630
@@ -46,7 +65,10 @@ const mark = (x, y, size) => `
  * the renderer understands bidi — the shaping inside a run is the font's job
  * and is handled either way.
  */
-function card({ name, tagline, families, phone, footnote }) {
+const FA = 'Vazirmatn Variable'
+const EN = 'Outfit'
+
+function card({ wordmark, tagline, families, phone }) {
   const right = WIDTH - 80
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
@@ -77,54 +99,85 @@ function card({ name, tagline, families, phone, footnote }) {
     <path d="M-40 630c220-120 440-120 660 0s440 120 660 0" />
   </g>
 
-  ${mark(right - 92, 74, 92)}
+  ${mark(right - 104, 70, 104)}
 
-  <text x="${right}" y="248" text-anchor="end" font-family="Vazirmatn Variable, Vazirmatn"
-        font-size="92" font-weight="800" fill="#ffffff">${name}</text>
+  <!-- Wordmark. Latin, so it names Outfit — see the note at the top. -->
+  <text x="${right}" y="292" text-anchor="end" font-family="${EN}"
+        font-size="118" font-weight="800" letter-spacing="-2" fill="#ffffff">${wordmark}</text>
 
-  <text x="${right}" y="330" text-anchor="end" font-family="Vazirmatn Variable, Vazirmatn"
-        font-size="38" font-weight="500" fill="#d1fae5">${tagline}</text>
+  <text x="${right}" y="356" text-anchor="end" font-family="${FA}"
+        font-size="36" font-weight="500" fill="#d1fae5">${tagline}</text>
 
-  <g font-family="Vazirmatn Variable, Vazirmatn" font-size="30" font-weight="600" fill="#ffffff">
+  <g font-family="${FA}" font-size="29" font-weight="600" fill="#ecfdf5">
     ${families
       .map((label, i) => {
         // Laid out right to left, the direction the rest of the site reads in.
-        const w = label.length * 17 + 44
-        const x = right - families.slice(0, i).reduce((s, l) => s + l.length * 17 + 44 + 14, 0) - w
+        const w = label.length * 16.5 + 42
+        const x =
+          right - families.slice(0, i).reduce((sum, l) => sum + l.length * 16.5 + 42 + 13, 0) - w
         return `<g>
-      <rect x="${x}" y="392" width="${w}" height="58" rx="18"
+      <rect x="${x}" y="412" width="${w}" height="56" rx="17"
             fill="rgba(255,255,255,0.13)" stroke="rgba(255,255,255,0.28)" stroke-width="1" />
-      <text x="${x + w / 2}" y="430" text-anchor="middle" fill="#ecfdf5">${label}</text>
+      <text x="${x + w / 2}" y="449" text-anchor="middle">${label}</text>
     </g>`
       })
       .join('')}
   </g>
 
-  <text x="${right}" y="556" text-anchor="end" font-family="Vazirmatn Variable, Vazirmatn"
-        font-size="34" font-weight="700" fill="#ffffff">${phone}</text>
-  <text x="80" y="556" text-anchor="start" font-family="Vazirmatn Variable, Vazirmatn"
-        font-size="28" font-weight="500" fill="#a7f3d0">${footnote}</text>
+  <!-- Latin digits, so Outfit again. Loosened a little: this is the one thing
+       on the card a reader may want to read off and dial. -->
+  <text x="${right}" y="560" text-anchor="end" font-family="${EN}"
+        font-size="40" font-weight="700" letter-spacing="2" fill="#ffffff">${phone}</text>
 </svg>`
 }
 
-/** Renders the card to PNG bytes. */
-export function renderOgCard(content, projectRoot) {
-  const font = resolve(
-    projectRoot,
-    'node_modules/@fontsource-variable/vazirmatn/files/vazirmatn-arabic-wght-normal.woff2',
-  )
-  const latin = resolve(
-    projectRoot,
-    'node_modules/@fontsource-variable/vazirmatn/files/vazirmatn-latin-wght-normal.woff2',
-  )
+
+/**
+ * Only the Arabic subset of Vazirmatn is loaded. Its Latin siblings declare
+ * the same family name, so loading one of those as well would leave which
+ * file answers to "Vazirmatn" down to load order — the bug this pairing
+ * exists to avoid. Latin has its own family and its own files.
+ *
+ * One file per weight the card actually draws, and no more.
+ */
+const FACES = [
+  // Persian comes from the variable file the site itself ships. Fontsource's
+  // *static* Vazirmatn subsets decompress fine but resvg will not match them
+  // by any name — they render as tofu — so the variable one it is.
+  '@fontsource-variable/vazirmatn/files/vazirmatn-arabic-wght-normal.woff2',
+  // Latin has to be static: resvg ignores variable weight axes, so the
+  // variable Outfit came out at its thin default instead of a wordmark.
+  '@fontsource/outfit/files/outfit-latin-800-normal.woff2',
+  '@fontsource/outfit/files/outfit-latin-700-normal.woff2',
+]
+
+/** woff2 in, a path to a plain sfnt out, decompressed once and cached. */
+async function sfntPath(projectRoot, relative) {
+  const cache = resolve(projectRoot, 'node_modules/.cache/nylonium-og-fonts')
+  mkdirSync(cache, { recursive: true })
+
+  const out = resolve(cache, relative.split('/').pop().replace(/\.woff2$/, '.ttf'))
+  if (!existsSync(out)) {
+    const woff2 = readFileSync(resolve(projectRoot, 'node_modules', relative))
+    writeFileSync(out, Buffer.from(await decompress(woff2)))
+  }
+  return out
+}
+
+
+export async function renderOgCard(content, projectRoot) {
+  // One at a time, deliberately. wawoff2 is a WebAssembly build around a
+  // single shared heap, so decompressing in parallel interleaves the writes
+  // and every file comes back corrupt — same byte length, wrong bytes, and a
+  // renderer that silently falls back to tofu rather than complaining.
+  const fontFiles = []
+  for (const face of FACES) {
+    fontFiles.push(await sfntPath(projectRoot, face))
+  }
 
   const resvg = new Resvg(card(content), {
     fitTo: { mode: 'width', value: WIDTH },
-    font: {
-      fontBuffers: [readFileSync(font), readFileSync(latin)],
-      defaultFontFamily: 'Vazirmatn Variable',
-      loadSystemFonts: false,
-    },
+    font: { fontFiles, defaultFontFamily: FA, loadSystemFonts: false },
   })
 
   return resvg.render().asPng()
