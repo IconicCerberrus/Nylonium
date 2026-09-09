@@ -10,7 +10,19 @@ import { site } from '../data/site.js'
  * moment Vazirmatn resolves, which is most of what read as "the site loads in
  * pieces". The overlay is capped by a timeout so a slow font can never hold
  * the page hostage, and it is skipped entirely for reduced-motion readers.
+ *
+ * Every duration here is a cost paid on top of a page that is already ready,
+ * so they are kept as short as the job allows. The font is bundled and
+ * preloaded, so it is resolved long before the cap; the cap exists only for
+ * the pathological case, and holding the page for most of a second to insure
+ * against it made the common visit worse than the problem being solved.
  */
+/** Ceiling on waiting for the webfont before the curtain lifts regardless. */
+const FONT_WAIT_CAP = 300
+/** Long enough for the resolved font to be painted, short enough not to read as a pause. */
+const SETTLE = 40
+/** Fade-out, and therefore how long the curtain stays on top of a live page. */
+const FADE = 250
 export default function PageLoader() {
   const [done, setDone] = useState(false)
   const [gone, setGone] = useState(false)
@@ -30,11 +42,11 @@ export default function PageLoader() {
     // Never let a stalled font request keep the curtain up. The font is
     // bundled locally and preloaded, so it resolves well inside this — the
     // cap only exists for the pathological case.
-    const cap = new Promise((resolve) => setTimeout(resolve, 800))
+    const cap = new Promise((resolve) => setTimeout(resolve, FONT_WAIT_CAP))
 
     // A short timer rather than rAF: requestAnimationFrame never fires while
     // the tab is backgrounded, which would strand the curtain on screen.
-    Promise.race([fonts, cap]).then(() => setTimeout(finish, 120))
+    Promise.race([fonts, cap]).then(() => setTimeout(finish, SETTLE))
 
     return () => {
       cancelled = true
@@ -44,24 +56,29 @@ export default function PageLoader() {
   // Unmount only after the fade-out has finished playing.
   useEffect(() => {
     if (!done) return
-    const t = setTimeout(() => setGone(true), 700)
+    const t = setTimeout(() => setGone(true), FADE)
     return () => clearTimeout(t)
   }, [done])
 
+  // Released as the fade begins rather than when it ends. The curtain is
+  // already `pointer-events-none` by then and the page underneath is live, so
+  // holding the scroll for the length of the fade only makes the page feel
+  // stuck at the moment it is becoming usable.
   useEffect(() => {
-    document.body.style.overflow = gone ? '' : 'hidden'
+    document.body.style.overflow = done ? '' : 'hidden'
     return () => {
       document.body.style.overflow = ''
     }
-  }, [gone])
+  }, [done])
 
   if (gone) return null
 
   return (
     <div
-      className={`ease-soft fixed inset-0 z-100 grid place-items-center bg-[var(--surface)] transition-opacity duration-700 ${
+      className={`ease-soft fixed inset-0 z-100 grid place-items-center bg-[var(--surface)] transition-opacity ${
         done ? 'pointer-events-none opacity-0' : 'opacity-100'
       }`}
+      style={{ transitionDuration: `${FADE}ms` }}
       role="status"
       aria-live="polite"
     >
