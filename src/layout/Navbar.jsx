@@ -3,8 +3,17 @@ import { ChevronDown, Menu, MoonStar, Send, Sun, X } from 'lucide-react'
 import Logo from '../ui/Logo'
 import { useTheme } from '../hooks/useTheme.js'
 import { useContactDialog } from '../context/contactDialogContext.js'
-import { home } from '../lib/links.js'
+import { home, page as pageHref } from '../lib/links.js'
 import { navLinks, site } from '../data/site.js'
+
+/*
+ * Every href in this file goes through `home()` or `pageHref()`, without
+ * exception. The hrefs in `navLinks` are written relative to the project root
+ * ('tagheei.html'), and the navbar is rendered from two different depths —
+ * the root pages and the variant pages under product/. Using one of those
+ * strings raw works at the root and 404s everywhere else, which is precisely
+ * what it did on all 135 variant pages until this was fixed.
+ */
 
 /**
  * Reading-progress bar pinned under the header.
@@ -89,7 +98,7 @@ function DesktopLink({ link }) {
   if (!link.children) {
     return (
       <a
-        href={link.home ? home(link.href) : link.href}
+        href={link.home ? home(link.href) : pageHref(link.href)}
         className="ease-soft relative rounded-lg px-3 py-2 text-sm font-medium text-[var(--text-body)] transition-colors duration-400 hover:text-brand-ink after:absolute after:inset-x-3 after:bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-brand-500 after:transition-transform after:duration-[420ms] after:ease-[cubic-bezier(0.33,1,0.45,1)] hover:after:origin-right hover:after:scale-x-100"
       >
         {link.label}
@@ -108,7 +117,7 @@ function DesktopLink({ link }) {
   return (
     <div className="relative" onMouseEnter={show} onMouseLeave={hide}>
       <a
-        href={link.home ? home(link.href) : link.href}
+        href={link.home ? home(link.href) : pageHref(link.href)}
         onFocus={show}
         aria-expanded={open}
         className="ease-soft flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[var(--text-body)] transition-colors duration-400 hover:text-brand-ink"
@@ -130,7 +139,7 @@ function DesktopLink({ link }) {
           {link.children.map((child) => (
             <li key={child.href}>
               <a
-                href={child.href}
+                href={pageHref(child.href)}
                 onBlur={hide}
                 className="ease-soft block rounded-xl px-3 py-2.5 text-sm text-[var(--text-body)] transition-colors duration-400 hover:bg-brand-500/10 hover:text-brand-ink"
               >
@@ -309,7 +318,7 @@ export default function Navbar() {
                           {link.children.map((child) => (
                             <li key={child.href}>
                               <a
-                                href={child.href}
+                                href={pageHref(child.href)}
                                 tabIndex={menuOpen ? 0 : -1}
                                 onClick={() => setMenuOpen(false)}
                                 className="block rounded-lg border-r-2 border-brand-500/25 px-3 py-2.5 text-sm text-[var(--text-body)] transition-colors hover:border-brand-500 hover:text-brand-ink"
@@ -323,7 +332,7 @@ export default function Navbar() {
                     </>
                   ) : (
                     <a
-                      href={link.home ? home(link.href) : link.href}
+                      href={link.home ? home(link.href) : pageHref(link.href)}
                       tabIndex={menuOpen ? 0 : -1}
                       onClick={() => setMenuOpen(false)}
                       className="block rounded-xl px-3 py-3 text-[0.95rem] font-medium text-[var(--text-strong)] transition-colors hover:bg-brand-500/8 hover:text-brand-ink"
