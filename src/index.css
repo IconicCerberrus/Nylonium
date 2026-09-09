@@ -335,6 +335,38 @@
   }
 }
 
+/* Section reveal, driven by the element's own position in the scrollport.
+
+   Written so that "no animation" is the resting state rather than "hidden":
+   the content is visible with this rule absent, unsupported, or turned off
+   for reduced motion. That is what lets the page be prerendered — the markup
+   arrives complete, and script never has to un-hide anything.
+
+   Same shape as `.scroll-progress` below, which is the other place in this
+   file that hands an animation to the scroll timeline. */
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--reveal-y, 18px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      /* Finished a little before the block reaches the middle of the screen,
+         so it is settled by the time it is being read. */
+      animation-range: entry 0% cover 28%;
+    }
+  }
+}
+
 /* Decorative loops hold still while their section is off-screen.
    `useInView` sets the attribute; see the hook for why it fails open.
 

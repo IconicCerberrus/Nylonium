@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react'
-import { isBrowser } from '../lib/browser.js'
 
 const STORAGE_KEY = 'nylonium-theme'
 
@@ -9,15 +8,20 @@ const STORAGE_KEY = 'nylonium-theme'
  * flash of the wrong theme, so this hook only mirrors and updates that state.
  */
 export function useTheme() {
-  // The build-time pass has no stored preference and no OS to ask, so it
-  // renders the light-theme toggle. Nothing else depends on this: the themes
-  // are CSS custom properties, so the same markup serves both and only the
-  // toggle's own icon differs.
-  const [theme, setTheme] = useState(() =>
-    isBrowser && document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-  )
+  // Starts light on the server and on the first client render, then reads
+  // what the inline script in the shell already applied. Only the toggle's own
+  // icon depends on this — both themes are CSS custom properties over the same
+  // markup — so settling it on mount costs nothing and keeps hydration exact.
+  const [theme, setTheme] = useState('light')
+  const [synced, setSynced] = useState(false)
 
   useEffect(() => {
+    setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+    setSynced(true)
+  }, [])
+
+  useEffect(() => {
+    if (!synced) return
     const isDark = theme === 'dark'
     document.documentElement.classList.toggle('dark', isDark)
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light'
@@ -26,7 +30,7 @@ export function useTheme() {
     } catch {
       // Private mode / storage disabled — the in-memory theme still works.
     }
-  }, [theme])
+  }, [theme, synced])
 
   // Follow the OS while the visitor has not made an explicit choice.
   useEffect(() => {

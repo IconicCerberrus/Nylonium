@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "gen": "node scripts/gen-pages.mjs",
     "predev": "npm run gen",
     "prebuild": "npm run gen",
-    "ssr-check": "node scripts/ssr-check.mjs"
+    "ssr-check": "node scripts/ssr-check.mjs",
+    "prerender": "node scripts/prerender.mjs"
   },
   "dependencies": {
     "@fontsource-variable/vazirmatn": "^5.3.0",

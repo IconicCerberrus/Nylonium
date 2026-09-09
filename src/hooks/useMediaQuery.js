@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
-import { isBrowser } from '../lib/browser.js'
 
 /**
- * Tracks a media query. Seeded synchronously so the very first render already
- * matches the device — the mobile rails and the desktop grid never swap after
- * paint.
+ * Tracks a media query.
+ *
+ * Answers `false` until the component has mounted, on the server and in the
+ * browser alike. The seed used to be read synchronously from `matchMedia`,
+ * which is better on its own terms — but the markup is prerendered now, and a
+ * first client render that disagreed with it would make React throw the
+ * server's HTML away for that subtree and build it again. So the narrow
+ * layout is what ships, and a wide screen corrects itself on mount.
  *
  * Listens to `resize` as well as the query's own `change` event. The change
  * event is the correct signal, but it does not always arrive when a viewport
@@ -12,14 +16,7 @@ import { isBrowser } from '../lib/browser.js'
  * one strands the component on the wrong layout for the rest of the session.
  */
 export function useMediaQuery(query) {
-  // Node has no viewport, so the build-time pass answers `false` for every
-  // query and the static markup is always the narrow layout. In the browser
-  // the seed is still read synchronously, which is the whole point of the
-  // hook — so on a wide screen the first client render disagrees with the
-  // markup it is hydrating and React re-renders that subtree once. That is
-  // the correct trade here: a single reconciliation on load, rather than a
-  // layout that visibly swaps after paint on every device.
-  const [matches, setMatches] = useState(() => isBrowser && window.matchMedia(query).matches)
+  const [matches, setMatches] = useState(false)
 
   useEffect(() => {
     const mq = window.matchMedia(query)
