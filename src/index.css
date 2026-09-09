@@ -137,6 +137,9 @@
     --line: color-mix(in oklab, var(--color-ink-300) 70%, transparent);
     --glass-bg: color-mix(in oklab, var(--color-white) 62%, transparent);
     --glass-line: color-mix(in oklab, var(--color-white) 80%, transparent);
+    /* Reads as the same material as --glass-bg without a backdrop pass. It is
+       carried further towards opaque because nothing blurs behind it. */
+    --panel-bg: color-mix(in oklab, var(--color-white) 88%, transparent);
     --halo-a: color-mix(in oklab, var(--color-brand-400) 30%, transparent);
     --halo-b: color-mix(in oklab, var(--color-accent-400) 26%, transparent);
     --grid-line: color-mix(in oklab, var(--color-ink-900) 6%, transparent);
@@ -158,6 +161,7 @@
     --line: color-mix(in oklab, var(--color-ink-100) 12%, transparent);
     --glass-bg: color-mix(in oklab, var(--color-ink-900) 55%, transparent);
     --glass-line: color-mix(in oklab, var(--color-ink-100) 10%, transparent);
+    --panel-bg: color-mix(in oklab, var(--color-ink-900) 88%, transparent);
     --halo-a: color-mix(in oklab, var(--color-brand-500) 26%, transparent);
     --halo-b: color-mix(in oklab, var(--color-accent-600) 30%, transparent);
     --grid-line: color-mix(in oklab, var(--color-ink-50) 6%, transparent);
@@ -213,10 +217,35 @@
 }
 
 /* ── Tier 3: reusable UI utilities ───────────────────────────────── */
+/* Frosted panel. `backdrop-filter` makes the browser re-sample and blur
+   whatever sits behind the element on every frame that the backdrop moves,
+   so this is reserved for the few surfaces that are small, stationary, or
+   sit over something worth seeing through: the navbar, its dropdown, the
+   floating contact buttons and a couple of hero badges.
+
+   Anything numerous, large, or animated uses `surface-panel` instead — see
+   the note there. */
 @utility surface-glass {
   background-color: var(--glass-bg);
   border: 1px solid var(--glass-line);
   backdrop-filter: blur(20px) saturate(1.6);
+}
+
+/* The same material without the backdrop pass, for surfaces where the blur
+   costs a great deal and shows very little:
+
+   - Product and variant cards. They are the largest and by far the most
+     numerous raised surfaces on the page — the mobile rails render each one
+     several times — and their top third is an opaque image panel that hides
+     the effect anyway, more so once real photography lands there.
+   - The floating hero chips, which animate. Translating an element that
+     carries a backdrop-filter re-blurs its backdrop every frame, which is
+     the one combination the motion rule in the README exists to avoid.
+
+   Translucency is kept: alpha compositing is cheap, the blur is not. */
+@utility surface-panel {
+  background-color: var(--panel-bg);
+  border: 1px solid var(--glass-line);
 }
 
 /* Theme-aware brand green for text and meaningful icons. */
