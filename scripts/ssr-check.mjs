@@ -62,15 +62,32 @@ try {
     }
   }
 
-  // The depth prefix has to survive into the markup, or every link on a
-  // variant page would point one directory too high once prerendered.
+  /*
+   * Every internal link on a variant page has to carry the ../ prefix.
+   *
+   * This is not hypothetical. The navbar rendered the hrefs from navLinks
+   * raw — they are written relative to the project root — so from product/
+   * they resolved to product/tagheei.html and 404'd, on all 135 variant
+   * pages, for as long as those pages have existed. A link audit that only
+   * asks "does the target exist" passes that happily, because the target
+   * does exist; it has to resolve the URL against the page it was rendered
+   * on, which is what this does.
+   */
   setPageContext({ root: '../', home: false })
   const variantHtml = renderToString(wrap(h(VariantPage, { page: family, variant })))
-  if (!variantHtml.includes('href="../')) {
+
+  const internal = [...variantHtml.matchAll(/href="([^"]+)"/g)]
+    .map((m) => m[1])
+    .filter((href) => !/^(#|\.\.\/|https?:|tel:|mailto:)/.test(href))
+
+  if (internal.length) {
     failed++
-    console.error('  FAIL links   variant page did not use its ../ prefix')
+    console.error(
+      `  FAIL links    ${internal.length} link(s) on the variant page are missing their ../ prefix:`,
+    )
+    for (const href of [...new Set(internal)].slice(0, 8)) console.error(`         ${href}`)
   } else {
-    console.log('  ok   links    variant page links resolve through ../')
+    console.log('  ok   links    every internal link on the variant page resolves through ../')
   }
 
   await server.close()
